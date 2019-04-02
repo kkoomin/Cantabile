@@ -6,38 +6,61 @@ import {
 } from "react-navigation";
 
 import TabBarIcon from "../components/TabBarIcon";
-import HomeScreen from "../screens/HomeScreen";
-import LinksScreen from "../screens/LinksScreen";
+import CalendarScreen from "../screens/CalendarScreen";
+import ScoreScreen from "../screens/ScoreScreen";
+import LogScreen from "../screens/LogScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 
-const HomeStack = createStackNavigator({
-  Home: HomeScreen
+const CalendarStack = createStackNavigator({
+  Calendar: CalendarScreen
 });
 
-HomeStack.navigationOptions = {
-  tabBarLabel: "Home",
+CalendarStack.navigationOptions = {
+  tabBarLabel: "Calendar",
+  tabBarOptions: {
+    activeTintColor: "#000",
+    inactiveTintColor: "#ccc"
+  },
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
-      name={
-        Platform.OS === "ios"
-          ? `ios-information-circle${focused ? "" : "-outline"}`
-          : "md-information-circle"
-      }
+      name={Platform.OS === "ios" ? `ios-calendar` : "md-calendar"}
     />
   )
 };
 
-const LinksStack = createStackNavigator({
-  Links: LinksScreen
+const ScoreStack = createStackNavigator({
+  Score: ScoreScreen
 });
 
-LinksStack.navigationOptions = {
-  tabBarLabel: "Links",
+ScoreStack.navigationOptions = {
+  tabBarLabel: "Score",
+  tabBarOptions: {
+    activeTintColor: "#000",
+    inactiveTintColor: "#ccc"
+  },
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
-      name={Platform.OS === "ios" ? "ios-link" : "md-link"}
+      name={Platform.OS === "ios" ? "ios-document" : "md-document"}
+    />
+  )
+};
+
+const LogStack = createStackNavigator({
+  Log: LogScreen
+});
+
+LogStack.navigationOptions = {
+  tabBarLabel: "Log",
+  tabBarOptions: {
+    activeTintColor: "#000",
+    inactiveTintColor: "#ccc"
+  },
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon
+      focused={focused}
+      name={Platform.OS === "ios" ? "ios-musical-notes" : "md-musical-notes"}
     />
   )
 };
@@ -48,20 +71,10 @@ const SettingsStack = createStackNavigator({
 
 SettingsStack.navigationOptions = {
   tabBarLabel: "Settings",
-  tabBarIcon: ({ focused }) => (
-    <TabBarIcon
-      focused={focused}
-      name={Platform.OS === "ios" ? "ios-options" : "md-options"}
-    />
-  )
-};
-
-const ETC = createStackNavigator({
-  Settings: SettingsScreen
-});
-
-SettingsStack.navigationOptions = {
-  tabBarLabel: "Settings",
+  tabBarOptions: {
+    activeTintColor: "#000",
+    inactiveTintColor: "#ccc"
+  },
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
@@ -71,8 +84,8 @@ SettingsStack.navigationOptions = {
 };
 
 export default createBottomTabNavigator({
-  HomeStack,
-  LinksStack,
-  SettingsStack,
-  ETC
+  CalendarStack,
+  ScoreStack,
+  LogStack,
+  SettingsStack
 });
