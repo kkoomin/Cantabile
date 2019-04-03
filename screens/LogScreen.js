@@ -1,5 +1,7 @@
 import React from "react";
 import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
+import Timer from "../components/Timer";
+import DateFormat from "../constants/DateFormat";
 
 let current_datetime = new Date();
 const months = [
@@ -27,7 +29,7 @@ let formatted_date =
 
 export default class ChatScreen extends React.Component {
   state = {
-    currentDay: formatted_date
+    currentDay: DateFormat.stringDate(current_datetime)
   };
 
   static navigationOptions = {
@@ -40,6 +42,7 @@ export default class ChatScreen extends React.Component {
         <View style={styles.titleContainer}>
           <Text style={styles.logTitle}>{this.state.currentDay}</Text>
         </View>
+        <Timer />
       </View>
     );
   }
@@ -49,7 +52,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 15,
-    backgroundColor: "#fff"
+    backgroundColor: "#fff",
+    alignItems: "center"
   },
   titleContainer: {
     alignItems: "center"

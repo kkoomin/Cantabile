@@ -3,39 +3,70 @@ import {
   TouchableOpacity,
   StyleSheet,
   Text,
-  Button,
-  View,
-  Dimensions
+  ScrollView,
+  View
 } from "react-native";
-import { Permissions, Font } from "expo";
-import { Calendar, CalendarList, Agenda, Arrow } from "react-native-calendars";
+import { Font } from "expo";
+import { Calendar } from "react-native-calendars";
 import Schedule from "../components/Schedule";
 import ScheduleForm from "../components/ScheduleForm";
+import ScheduleDetail from "../components/ScheduleDetail";
+import DateFormat from "../constants/DateFormat";
+import Layout from "../constants/Layout";
+import PracticeHours from "../components/PracticeHours";
 
-const { width, height } = Dimensions.get("window");
 const SchduleData = [
-  { id: 1, date: "2019-04-01", content: "first schedule" },
-  { id: 2, date: "2019-04-01", content: "second schedule" },
-  { id: 3, date: "2019-04-03", content: "third schedule" },
-  { id: 4, date: "2019-04-03", content: "fourth schedule" } //date should be id
-];
-const DateData = [
-  { id: 1, date: "2019-04-01", practice_hours: "03:00:23" },
-  { id: 2, date: "2019-04-03", practice_hours: "02:48:23" }
+  {
+    id: 1,
+    date: "2019-05-01",
+    time: "14:30",
+    content: "Lesson: @Seoul.uni /w Mrs.Kim",
+    starred: false,
+    memo: null
+  },
+  {
+    id: 2,
+    date: "2019-05-01",
+    time: null,
+    content: "Call to Lim (about camp)",
+    starred: true,
+    memo: null
+  },
+  {
+    id: 3,
+    date: "2019-04-03",
+    time: "17:20",
+    content: "Music Competition",
+    starred: true,
+    memo: null
+  },
+  {
+    id: 4,
+    date: "2019-04-03",
+    time: "10:45",
+    content:
+      "Go to music store to buy new string, Go to music store to buy new string, Go to music store to buy new string",
+    starred: false,
+    memo: null
+  },
+  {
+    id: 5,
+    date: "2019-04-03",
+    time: "10:45",
+    content:
+      "Go to music store to buy new string, Go to music store to buy new string, Go to music store to buy new string, Go to music store to buy new stringGo to music store to buy new stringGo to music store to buy new stringGo to music store to buy new stringGo to music store to buy new string",
+    starred: false,
+    memo: null
+  }
 ];
 
-let current_datetime = new Date();
-let formatted_date = `${current_datetime.getFullYear()}-
-${
-  current_datetime.getMonth() < 10
-    ? "0" + (current_datetime.getMonth() + 1)
-    : current_datetime.getMonth() + 1
-}-
-${
-  current_datetime.getDate() < 10
-    ? "0" + current_datetime.getDate()
-    : current_datetime.getDate()
-}`;
+const PracticeTimeData = [
+  {
+    id: 1,
+    date: "2019-04-03",
+    hours: "02:10:45"
+  }
+];
 
 export default class CalendarScreen extends React.Component {
   static navigationOptions = () => {
@@ -47,54 +78,85 @@ export default class CalendarScreen extends React.Component {
   state = {
     fontLoaded: false,
     weekSelect: false,
-    dateSelected: {
-      [formatted_date]: {
-        selected: true,
-        selectedColor: "#B83925",
-        date: formatted_date
-      }
-    },
-    formOpened: false
+    selectedDateObj: null,
+    selectedDateString: undefined,
+    formOpened: false,
+    detailOpened: false,
+    selectedSchedule: null
   };
 
   async componentDidMount() {
+    let current_datetime = new Date();
+
     await Font.loadAsync({
       "space-mono": require("../assets/fonts/SpaceMono-Regular.ttf")
     });
-    this.setState({ fontLoaded: true });
+    this.setState({
+      fontLoaded: true,
+      selectedDateObj: {
+        [DateFormat.scheduleDate(current_datetime)]: {
+          selected: true,
+          selectedColor: "#B83925",
+          date: DateFormat.scheduleDate(current_datetime)
+        }
+      },
+      selectedDateString: DateFormat.scheduleDate(current_datetime)
+    });
   }
 
   _toggleScheduleForm = () => {
     this.setState({ formOpened: !this.state.formOpened });
   };
 
+  _toggleScheduleDetail = data => {
+    if (this.state.detailOpened) {
+      this.setState({ selectedSchedule: null, detailOpened: false });
+    } else {
+      this.setState({ selectedSchedule: data, detailOpened: true });
+    }
+  };
+
   render() {
-    const { formOpened, dateSelected } = this.state;
+    const {
+      formOpened,
+      detailOpened,
+      selectedDateObj,
+      selectedDateString,
+      selectedSchedule
+    } = this.state;
     return (
-      <View style={styles.container}>
-        {this.state.fontLoaded ? (
+      <ScrollView
+        contentContainerStyle={[
+          styles.container,
+          detailOpened || formOpened
+            ? { backgroundColor: "rgba(0,0,0,0.2)" }
+            : ""
+        ]}
+      >
+        {this.state.fontLoaded && !detailOpened && !formOpened ? (
           <Calendar
             onDayPress={day => {
               this.setState(
                 {
-                  dateSelected: {
+                  selectedDateObj: {
                     [day.dateString]: {
                       selected: true,
                       selectedColor: "#B83925",
                       date: day.dateString
                     }
-                  }
+                  },
+                  selectedDateString: day.dateString
                 },
                 () => {
-                  console.log(this.state.dateSelected);
+                  console.log(selectedDateObj);
                 }
               );
             }}
-            markedDates={this.state.dateSelected} //'markedDates' property is expecting an object.
-            // Handler which gets executed on day long press. Default = undefined
             onDayLongPress={day => {
               console.log("selected day", day);
             }}
+            markedDates={selectedDateObj}
+            onMonthChange={() => this.setState({ selectedDateObj: null })}
             monthFormat={"yyyy / MM"}
             hideExtraDays={true}
             disableMonthChange={true}
@@ -120,7 +182,7 @@ export default class CalendarScreen extends React.Component {
               textDayHeaderFontFamily: "space-mono",
               textMonthFontWeight: "bold",
               textDayFontSize: 16,
-              textMonthFontSize: 16,
+              textMonthFontSize: 20,
               textDayHeaderFontSize: 16
             }}
           />
@@ -128,31 +190,51 @@ export default class CalendarScreen extends React.Component {
         {!formOpened ? (
           <>
             <View style={styles.daySchedule}>
-              <View style={styles.practiceHours}>
-                <Text style={styles.dayScheduleTitle}>Practice Hours</Text>
-                <Text>03:00:23</Text>
-              </View>
-              <View>
-                <Text style={styles.dayScheduleTitle}>Schedule</Text>
-                <Schedule
-                  data={SchduleData.filter(
-                    data => data.date === Object.values(dateSelected)[0].date
-                  )}
-                  toggleScheduleForm={this._toggleScheduleForm}
-                />
-              </View>
+              {selectedDateObj
+                ? PracticeTimeData.filter(
+                    data => data.date === Object.values(selectedDateObj)[0].date
+                  ).map((data, index) => (
+                    <PracticeHours key={`${data.date}-${index}`} data={data} />
+                  ))
+                : null}
+
+              <ScrollView>
+                {selectedDateObj
+                  ? SchduleData.filter(
+                      data =>
+                        data.date === Object.values(selectedDateObj)[0].date
+                    ).map((data, index) => (
+                      <Schedule
+                        key={`${data.date}-${index}`}
+                        data={data}
+                        toggleScheduleDetail={this._toggleScheduleDetail}
+                      />
+                    ))
+                  : null}
+              </ScrollView>
             </View>
             <TouchableOpacity
               style={styles.scheduleCreateBtn}
               onPress={this._toggleScheduleForm}
             >
-              <Text>Create new schedule</Text>
+              <Text style={styles.scheduleCreateBtnText}>
+                Create new schedule
+              </Text>
             </TouchableOpacity>
           </>
         ) : (
-          <ScheduleForm toggleScheduleForm={this._toggleScheduleForm} />
+          <ScheduleForm
+            toggleScheduleForm={this._toggleScheduleForm}
+            selectedDateString={selectedDateString}
+          />
         )}
-      </View>
+        {detailOpened ? (
+          <ScheduleDetail
+            toggleScheduleDetail={this._toggleScheduleDetail}
+            data={selectedSchedule}
+          />
+        ) : null}
+      </ScrollView>
     );
   }
 }
@@ -163,28 +245,26 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   calendar: {
-    width: width - 50,
-    marginTop: 20,
+    width: Layout.window.width - 180,
+    marginTop: Layout.window.height * 0.04,
     marginBottom: 20
   },
   daySchedule: {
-    width: width - 50,
-    borderWidth: 1,
-    padding: 10
-  },
-  dayScheduleTitle: {
-    fontWeight: "600"
-  },
-  practiceHours: {
-    marginTop: 5,
-    marginBottom: 5
+    width: Layout.window.width - 150,
+    // borderWidth: 1,
+    paddingTop: 20
   },
   scheduleCreateBtn: {
     borderWidth: 1,
     borderRadius: 4,
-    padding: 5,
-    width: 150,
+    borderColor: "lightgrey",
+    padding: 10,
+    width: 250,
     alignItems: "center",
-    marginTop: 10
+    marginTop: 20
+  },
+  scheduleCreateBtnText: {
+    fontSize: 20,
+    color: "#910D01"
   }
 });

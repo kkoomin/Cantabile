@@ -18,8 +18,9 @@ const CalendarStack = createStackNavigator({
 CalendarStack.navigationOptions = {
   tabBarLabel: "Calendar",
   tabBarOptions: {
-    activeTintColor: "#000",
-    inactiveTintColor: "#ccc"
+    activeTintColor: "#910D01",
+    inactiveTintColor: "#ccc",
+    labelStyle: { fontSize: 15 }
   },
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
@@ -36,7 +37,7 @@ const ScoreStack = createStackNavigator({
 ScoreStack.navigationOptions = {
   tabBarLabel: "Score",
   tabBarOptions: {
-    activeTintColor: "#000",
+    activeTintColor: "#910D01",
     inactiveTintColor: "#ccc"
   },
   tabBarIcon: ({ focused }) => (
@@ -54,7 +55,7 @@ const LogStack = createStackNavigator({
 LogStack.navigationOptions = {
   tabBarLabel: "Log",
   tabBarOptions: {
-    activeTintColor: "#000",
+    activeTintColor: "#910D01",
     inactiveTintColor: "#ccc"
   },
   tabBarIcon: ({ focused }) => (
@@ -72,7 +73,7 @@ const SettingsStack = createStackNavigator({
 SettingsStack.navigationOptions = {
   tabBarLabel: "Settings",
   tabBarOptions: {
-    activeTintColor: "#000",
+    activeTintColor: "#910D01",
     inactiveTintColor: "#ccc"
   },
   tabBarIcon: ({ focused }) => (

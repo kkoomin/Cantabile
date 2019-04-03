@@ -1,6 +1,6 @@
 # Cantabile
 
-Cantabile is a app for music students.
+Cantabile is an iPad app for music students.
 
 ## Installation
 
@@ -16,28 +16,34 @@ npm start
 3. Practice log
    - Timer
    - Daily ToDo List
-4. Setting
 
 ## User Stories
 
 - Description of what a user should be able to do  
-  As a user, I will be able to login/logout  
-  As a user, I will be able to add and remove scores(musical sheets)  
-  As a user, I will be able to create and delete schedule
+  Able to login/logout  
+  Able to add and remove musical sheets
+  Able to create and delete schedule on calendar
+  Able to use the metronome whilst reading the score
+  Able to use timer to count daily practice hours
 
 ## Project Schedule
 
 - MVP features  
-  [ ] calendar schedule add form as modal  
+  [ ] calendar schedule add form  
   [ ] calendar schedule edit / delete  
   [ ] score list rendering  
   [ ] Metronome  
-  [ ] timer  
+  [v] timer  
   [ ] daily to do list
+  [ ] Login
 
 - Final version features
 
 - Stretch goals
+  [ ] multiple timer
+  [ ] page turner button for pdf
+  [ ] metronome visualizer
+  [ ] practice counter coloring game
 
 - Which features you plan on having done on which days
 
