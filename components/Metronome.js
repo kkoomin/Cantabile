@@ -5,7 +5,7 @@ import { Constants, Audio } from "expo";
 //와 이게 플레이 되기는하네 ^^..
 // play, stop 버튼 분리하고 setInterval...
 //https://snack.expo.io/BkX2ZNfmG
-const source = require("../assets/Korg-N1R-Sticks.wav");
+const source = require("../assets/Sticks.wav");
 
 export default class Metronome extends Component {
   state = {
@@ -111,11 +111,12 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#000"
+    backgroundColor: "grey",
+    height: 200
   },
   button: {
     width: 100,
-    height: 200,
+    height: 100,
     margin: 5,
     borderRadius: 10,
     backgroundColor: "#fff",

@@ -4,7 +4,8 @@ import {
   StyleSheet,
   Text,
   ScrollView,
-  View
+  View,
+  AsyncStorage
 } from "react-native";
 import { Font } from "expo";
 import { Calendar } from "react-native-calendars";
@@ -14,59 +15,7 @@ import ScheduleDetail from "../components/ScheduleDetail";
 import DateFormat from "../constants/DateFormat";
 import Layout from "../constants/Layout";
 import PracticeHours from "../components/PracticeHours";
-
-const SchduleData = [
-  {
-    id: 1,
-    date: "2019-05-01",
-    time: "14:30",
-    content: "Lesson: @Seoul.uni /w Mrs.Kim",
-    starred: false,
-    memo: null
-  },
-  {
-    id: 2,
-    date: "2019-05-01",
-    time: null,
-    content: "Call to Lim (about camp)",
-    starred: true,
-    memo: null
-  },
-  {
-    id: 3,
-    date: "2019-04-03",
-    time: "17:20",
-    content: "Music Competition",
-    starred: true,
-    memo: null
-  },
-  {
-    id: 4,
-    date: "2019-04-03",
-    time: "10:45",
-    content:
-      "Go to music store to buy new string, Go to music store to buy new string, Go to music store to buy new string",
-    starred: false,
-    memo: null
-  },
-  {
-    id: 5,
-    date: "2019-04-03",
-    time: "10:45",
-    content:
-      "Go to music store to buy new string, Go to music store to buy new string, Go to music store to buy new string, Go to music store to buy new stringGo to music store to buy new stringGo to music store to buy new stringGo to music store to buy new stringGo to music store to buy new string",
-    starred: false,
-    memo: null
-  }
-];
-
-const PracticeTimeData = [
-  {
-    id: 1,
-    date: "2019-04-03",
-    hours: "02:10:45"
-  }
-];
+import uuidv1 from "uuid/v1";
 
 export default class CalendarScreen extends React.Component {
   static navigationOptions = () => {
@@ -76,34 +25,44 @@ export default class CalendarScreen extends React.Component {
   };
 
   state = {
-    fontLoaded: false,
-    weekSelect: false,
-    selectedDateObj: null,
-    selectedDateString: undefined,
+    // fontLoaded: false,
+    // weekSelect: false,
+    selectedDateObj: null, // Line 100
+    selectedDateString: undefined, // ex) "2019-04-01"
+
     formOpened: false,
     detailOpened: false,
-    selectedSchedule: null
+
+    selectedSchedule: null,
+
+    schedules: [],
+    isSchedulesLoaded: false
   };
 
-  async componentDidMount() {
+  componentDidMount() {
+    //font 받으려면 async 앞에 붙여야함
     let current_datetime = new Date();
 
-    await Font.loadAsync({
-      "space-mono": require("../assets/fonts/SpaceMono-Regular.ttf")
-    });
+    // await Font.loadAsync({
+    //   "space-mono": require("../assets/fonts/SpaceMono-Regular.ttf")
+    // });
+    // AsyncStorage.clear();
     this.setState({
       fontLoaded: true,
       selectedDateObj: {
         [DateFormat.scheduleDate(current_datetime)]: {
           selected: true,
+          marked: false,
           selectedColor: "#B83925",
           date: DateFormat.scheduleDate(current_datetime)
         }
       },
       selectedDateString: DateFormat.scheduleDate(current_datetime)
     });
+    this._getSchedules();
   }
 
+  // TOGGLE STATES
   _toggleScheduleForm = () => {
     this.setState({ formOpened: !this.state.formOpened });
   };
@@ -116,21 +75,88 @@ export default class CalendarScreen extends React.Component {
     }
   };
 
+  // SCHEDULE FORM FUNCTIONS
+  _handleSubmit = (date, time, content, memo) => {
+    const newId = uuidv1();
+    const newSchedule = {
+      id: newId,
+      date: date,
+      time: time,
+      content: content,
+      memo: memo,
+      starred: false
+    };
+    let newSchedules = [newSchedule].concat(this.state.schedules);
+    this.setState({ schedules: newSchedules }, () => {
+      this._saveSchedules(this.state.schedules);
+    });
+  };
+
+  _updateSchedule = (id, content, memo) => {
+    let schedules = this.state.schedules;
+    updatedSchedules = schedules.map(schedule => {
+      if (schedule.id === id) {
+        schedule.content = content;
+        schedule.memo = memo;
+      }
+      return schedule;
+    });
+    this._saveSchedules(updatedSchedules);
+  };
+
+  _updateScheduleStar = id => {
+    let schedules = this.state.schedules;
+    updatedSchedules = schedules.map(schedule => {
+      if (schedule.id === id) {
+        schedule.starred = !schedule.starred;
+      }
+      return schedule;
+    });
+    this._saveSchedules(updatedSchedules);
+  };
+
+  _saveSchedules = newSchedules => {
+    AsyncStorage.setItem("schedules", JSON.stringify(newSchedules), () => {
+      this._getSchedules();
+    });
+  };
+
+  _getSchedules = async () => {
+    try {
+      const schedules = await AsyncStorage.getItem("schedules");
+      const parsedSchedules = JSON.parse(schedules);
+      this.setState({
+        isSchedulesLoaded: true,
+        schedules: parsedSchedules || []
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  _deleteSchedule = id => {
+    let schedules = this.state.schedules;
+    updatedSchedules = schedules.filter(schedule => schedule.id !== id);
+    this._saveSchedules(updatedSchedules);
+    this._toggleScheduleDetail();
+  };
+
   render() {
     const {
       formOpened,
       detailOpened,
       selectedDateObj,
       selectedDateString,
-      selectedSchedule
+      selectedSchedule,
+      schedules,
+      isSchedulesLoaded
     } = this.state;
+
     return (
-      <ScrollView
-        contentContainerStyle={[
+      <View
+        style={[
           styles.container,
-          detailOpened || formOpened
-            ? { backgroundColor: "rgba(0,0,0,0.2)" }
-            : ""
+          detailOpened || formOpened ? { backgroundColor: "rgba(0,0,0,0)" } : ""
         ]}
       >
         {this.state.fontLoaded && !detailOpened && !formOpened ? (
@@ -141,6 +167,7 @@ export default class CalendarScreen extends React.Component {
                   selectedDateObj: {
                     [day.dateString]: {
                       selected: true,
+                      marked: false,
                       selectedColor: "#B83925",
                       date: day.dateString
                     }
@@ -151,9 +178,6 @@ export default class CalendarScreen extends React.Component {
                   console.log(selectedDateObj);
                 }
               );
-            }}
-            onDayLongPress={day => {
-              console.log("selected day", day);
             }}
             markedDates={selectedDateObj}
             onMonthChange={() => this.setState({ selectedDateObj: null })}
@@ -177,9 +201,9 @@ export default class CalendarScreen extends React.Component {
               selectedDotColor: "#ffffff",
               arrowColor: "black",
               monthTextColor: "#910D01",
-              textDayFontFamily: "space-mono",
-              textMonthFontFamily: "space-mono",
-              textDayHeaderFontFamily: "space-mono",
+              // textDayFontFamily: "space-mono",
+              // textMonthFontFamily: "space-mono",
+              // textDayHeaderFontFamily: "space-mono",
               textMonthFontWeight: "bold",
               textDayFontSize: 16,
               textMonthFontSize: 20,
@@ -187,29 +211,33 @@ export default class CalendarScreen extends React.Component {
             }}
           />
         ) : null}
-        {!formOpened ? (
+        {!formOpened && !detailOpened ? (
           <>
             <View style={styles.daySchedule}>
-              {selectedDateObj
-                ? PracticeTimeData.filter(
-                    data => data.date === Object.values(selectedDateObj)[0].date
-                  ).map((data, index) => (
-                    <PracticeHours key={`${data.date}-${index}`} data={data} />
-                  ))
-                : null}
+              {selectedDateObj ? (
+                <PracticeHours
+                  data={this.props.screenProps.timers.find(
+                    timer =>
+                      timer.date === Object.values(selectedDateObj)[0].date
+                  )}
+                />
+              ) : null}
 
               <ScrollView>
-                {selectedDateObj
-                  ? SchduleData.filter(
-                      data =>
-                        data.date === Object.values(selectedDateObj)[0].date
-                    ).map((data, index) => (
-                      <Schedule
-                        key={`${data.date}-${index}`}
-                        data={data}
-                        toggleScheduleDetail={this._toggleScheduleDetail}
-                      />
-                    ))
+                {selectedDateObj && isSchedulesLoaded
+                  ? schedules
+                      .filter(
+                        schedule =>
+                          schedule.date ===
+                          Object.values(selectedDateObj)[0].date
+                      )
+                      .map(scheduleObj => (
+                        <Schedule
+                          key={scheduleObj.id}
+                          data={scheduleObj}
+                          toggleScheduleDetail={this._toggleScheduleDetail}
+                        />
+                      ))
                   : null}
               </ScrollView>
             </View>
@@ -222,19 +250,24 @@ export default class CalendarScreen extends React.Component {
               </Text>
             </TouchableOpacity>
           </>
-        ) : (
+        ) : null}
+        {formOpened ? (
           <ScheduleForm
             toggleScheduleForm={this._toggleScheduleForm}
             selectedDateString={selectedDateString}
+            handleSubmit={this._handleSubmit}
           />
-        )}
+        ) : null}
         {detailOpened ? (
           <ScheduleDetail
             toggleScheduleDetail={this._toggleScheduleDetail}
+            updateSchedule={this._updateSchedule}
+            updateScheduleStar={this._updateScheduleStar}
+            deleteSchedule={this._deleteSchedule}
             data={selectedSchedule}
           />
         ) : null}
-      </ScrollView>
+      </View>
     );
   }
 }
@@ -250,6 +283,7 @@ const styles = StyleSheet.create({
     marginBottom: 20
   },
   daySchedule: {
+    flex: 1,
     width: Layout.window.width - 150,
     // borderWidth: 1,
     paddingTop: 20
@@ -261,7 +295,8 @@ const styles = StyleSheet.create({
     padding: 10,
     width: 250,
     alignItems: "center",
-    marginTop: 20
+    marginTop: 20,
+    marginBottom: 20
   },
   scheduleCreateBtnText: {
     fontSize: 20,

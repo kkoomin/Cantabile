@@ -5,10 +5,11 @@ import {
   Modal,
   ScrollView,
   View,
-  Button,
   TextInput,
-  StyleSheet,
-  TouchableOpacity
+  TouchableWithoutFeedback,
+  Keyboard,
+  TouchableOpacity,
+  StyleSheet
 } from "react-native";
 import DateFormat from "../constants/DateFormat";
 import Layout from "../constants/Layout";
@@ -16,13 +17,21 @@ import { Icon } from "expo";
 
 export default class ScheduleForm extends Component {
   state = {
-    pickedDate: new Date(this.props.selectedDateString),
-    content: "",
-    memo: ""
+    date: new Date(this.props.selectedDateString), // JS datetime format
+    pickedDate: DateFormat.scheduleDate(
+      new Date(this.props.selectedDateString)
+    ), // "2019-04-04"
+    pickedTime: null, // "14:00"
+    content: "", // title of schedule
+    memo: "" // additional note of schedule
   };
 
   _setDate = newDate => {
-    this.setState({ pickedDate: newDate });
+    this.setState({
+      date: newDate,
+      pickedDate: DateFormat.scheduleDate(newDate),
+      pickedTime: DateFormat.time(newDate)
+    });
   };
 
   _changeContent = text => {
@@ -34,8 +43,8 @@ export default class ScheduleForm extends Component {
   };
 
   render() {
-    const { toggleScheduleForm, selectedDateString } = this.props;
-    const { pickedDate, content, memo } = this.state;
+    const { toggleScheduleForm, selectedDateString, handleSubmit } = this.props;
+    const { date, pickedDate, pickedTime, content, memo } = this.state;
     return (
       <Modal
         style={{ padding: 100 }}
@@ -50,37 +59,48 @@ export default class ScheduleForm extends Component {
           <Icon.Ionicons name={"ios-close-circle-outline"} size={40} />
         </TouchableOpacity>
 
-        <View style={styles.container}>
-          <DatePickerIOS date={pickedDate} onDateChange={this._setDate} />
-          <ScrollView contentContainerStyle={styles.innerContainer}>
-            <TextInput
-              style={styles.formInput}
-              multiline={true}
-              returnKeyType={"done"}
-              placeholder="Schedule Name"
-              placeholderTextColor={"#999"}
-              value={content}
-              onChangeText={this._changeContent}
-            />
-            <TextInput
-              style={[styles.formInput, styles.textArea]}
-              multiline={true}
-              returnKeyType={"done"}
-              placeholder="Additional Note"
-              placeholderTextColor={"#999"}
-              value={memo}
-              onChangeText={this._changeMemo}
-            />
-            <TouchableOpacity style={styles.createScheduleBtnContainer}>
-              <Text style={styles.createScheduleBtn}>Confirm</Text>
-            </TouchableOpacity>
-          </ScrollView>
-        </View>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+          <View style={styles.container}>
+            <DatePickerIOS date={date} onDateChange={this._setDate} />
+            <ScrollView
+              contentContainerStyle={styles.innerContainer}
+              keyboardShouldPersistTaps="handled" //키보드 열린채 버튼 누르기 가능!
+            >
+              <TextInput
+                style={styles.formInput}
+                multiline={true}
+                returnKeyType={"done"}
+                placeholder="Schedule Name"
+                placeholderTextColor={"#999"}
+                value={content}
+                onChangeText={this._changeContent}
+              />
+              <TextInput
+                style={[styles.formInput, styles.textArea]}
+                multiline={true}
+                returnKeyType={"done"}
+                placeholder="Additional Note"
+                placeholderTextColor={"#999"}
+                value={memo}
+                onChangeText={this._changeMemo}
+              />
+              <TouchableOpacity
+                style={styles.createScheduleBtnContainer}
+                onPress={() => {
+                  handleSubmit(pickedDate, pickedTime, content, memo);
+                  toggleScheduleForm();
+                }}
+              >
+                <Text style={styles.createScheduleBtn}>Confirm</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </TouchableWithoutFeedback>
       </Modal>
     );
   }
 }
-
+// 'confirm' btn -> set the selectedDateObj into the date just the schedule is created
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",
@@ -91,9 +111,11 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     bottom: "25%",
     justifyContent: "center",
-    borderRadius: 50
+    borderRadius: 50,
+    borderWidth: 1
   },
   innerContainer: {
+    marginTop: 20,
     height: "50%",
     width: "100%"
   },
@@ -102,7 +124,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomColor: "#bbb",
     borderBottomWidth: 1,
-    fontSize: 25
+    fontSize: 20
   },
   createScheduleBtnContainer: {
     borderWidth: 1,

@@ -1,35 +1,19 @@
 import React from "react";
-import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  TouchableWithoutFeedback,
+  Keyboard
+} from "react-native";
 import Timer from "../components/Timer";
 import DateFormat from "../constants/DateFormat";
-
-let current_datetime = new Date();
-const months = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec"
-];
-let formatted_date =
-  (current_datetime.getDate() < 10
-    ? "0" + current_datetime.getDate()
-    : current_datetime.getDate()) +
-  " " +
-  months[current_datetime.getMonth()] +
-  " " +
-  current_datetime.getFullYear();
+import ToDoList from "../components/ToDoList";
 
 export default class ChatScreen extends React.Component {
   state = {
-    currentDay: DateFormat.stringDate(current_datetime)
+    currentDay: new Date()
   };
 
   static navigationOptions = {
@@ -38,12 +22,20 @@ export default class ChatScreen extends React.Component {
 
   render() {
     return (
-      <View style={styles.container}>
-        <View style={styles.titleContainer}>
-          <Text style={styles.logTitle}>{this.state.currentDay}</Text>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <View style={styles.container}>
+          <View style={styles.titleContainer}>
+            <Text style={styles.logTitle}>
+              {DateFormat.stringDate(this.state.currentDay)}
+            </Text>
+          </View>
+          <Timer
+            currentDay={this.state.currentDay}
+            handleTimerSave={this.props.screenProps.handleTimerSave}
+          />
+          <ToDoList />
         </View>
-        <Timer />
-      </View>
+      </TouchableWithoutFeedback>
     );
   }
 }

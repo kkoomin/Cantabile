@@ -1,28 +1,17 @@
 import React from "react";
 import {
   Dimensions,
-  Platform,
-  TextInput,
   StyleSheet,
   Text,
   TouchableOpacity,
-  Button,
   View
 } from "react-native";
 import { Icon } from "expo";
 
 const { width, height } = Dimensions.get("window");
 
-// props: data
+// props: data(id, date, time, content, memo, starred)
 export default class Schedule extends React.Component {
-  state = {
-    starred: this.props.data.starred
-  };
-
-  _toggleStarred = () => {
-    this.setState({ starred: !this.state.starred });
-  };
-
   render() {
     const star = (
       <Icon.AntDesign
@@ -42,14 +31,13 @@ export default class Schedule extends React.Component {
       />
     );
     const { data, toggleScheduleDetail } = this.props;
-    const { starred } = this.state;
 
     return (
       <View style={styles.scheduleContainer}>
         {data ? (
           <>
             <Text style={[styles.scheduleText, styles.starred]}>
-              {starred ? star : unstar}
+              {data.starred ? star : unstar}
             </Text>
             <Text
               style={[styles.scheduleText, styles.content]}

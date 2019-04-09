@@ -35,7 +35,15 @@ const scheduleDate = dateTime => {
 
 // format: "16:23"
 const time = dateTime => {
-  return `${dateTime.getHours()}:${dateTime.getMinutes()}`;
+  return (
+    (dateTime.getHours() < 10
+      ? `0${dateTime.getHours()}`
+      : dateTime.getHours()) +
+    ":" +
+    (dateTime.getMinutes() < 10
+      ? `0${dateTime.getMinutes()}`
+      : dateTime.getMinutes())
+  );
 };
 
 export default {

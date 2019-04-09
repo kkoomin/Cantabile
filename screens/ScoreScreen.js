@@ -1,51 +1,93 @@
 import React from "react";
-import { Button, StyleSheet, View, Dimensions } from "react-native";
-import PDFReader from "rn-pdf-reader-js";
+import {
+  Button,
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  Keyboard
+} from "react-native";
 import { Icon } from "expo";
-import MetronomeDrawer from "./MetronomeDrawer";
+import MetronomeDrawer from "../components/MetronomeDrawer";
+import ScoreList from "../components/ScoreList";
+import ScoreReader from "../components/ScoreReader";
 
-const { height } = Dimensions.get("window").height;
-
-export default class LinksScreen extends React.Component {
+export default class ScoreScreen extends React.Component {
   static navigationOptions = ({ navigation }) => {
     const { params = {} } = navigation.state;
     return {
       title: "Score",
+      headerLeft: (
+        <TouchableOpacity style={{ width: 50, height: "100%" }}>
+          <Icon.Ionicons
+            name={params.scoreOpened ? "ios-arrow-back" : null}
+            size={28}
+            style={{ marginLeft: 10, marginTop: 5 }}
+            onPress={() => params.toggleFileState()}
+          />
+        </TouchableOpacity>
+      ),
       headerRight: (
-        // <Button onPress={() => params.toggleDrawer()} title="🎵" color="#000" />
-        <Icon.MaterialCommunityIcons
-          name={"metronome"}
-          size={28}
-          style={{ marginRight: 10, marginTop: 5 }}
-          onPress={() => params.toggleDrawer()}
-        />
+        <TouchableOpacity style={{ width: 40, height: "100%" }}>
+          <Icon.MaterialCommunityIcons
+            name={"metronome"}
+            size={28}
+            style={{ marginRight: 10, marginTop: 5 }}
+            onPress={() => params.toggleDrawer()}
+          />
+        </TouchableOpacity>
       )
     };
   };
 
   state = {
+    scores: null,
+    scoreSelected: false,
+    fileURI: null,
     drawerOpen: false
   };
 
   componentDidMount() {
-    this.props.navigation.setParams({ toggleDrawer: this._toggleDrawer });
+    this.props.navigation.setParams({
+      toggleDrawer: this._toggleDrawer,
+      toggleFileState: this._toggleFileState,
+      scoreOpened: false
+    });
   }
 
   _toggleDrawer = () => {
     this.setState({ drawerOpen: !this.state.drawerOpen });
   };
 
+  _toggleFileState = () => {
+    this.setState({ scoreSelected: false });
+    this.props.navigation.setParams({
+      scoreOpened: false
+    });
+  };
+
+  _openFile = uri => {
+    this.setState({ fileURI: uri, scoreSelected: true });
+    this.props.navigation.setParams({
+      scoreOpened: true
+    });
+  };
+
   render() {
-    const { drawerOpen } = this.state;
+    const { drawerOpen, scoreSelected, fileURI } = this.state;
     return (
       <View style={styles.container}>
-        <PDFReader
-          source={{
-            uri:
-              "file:///Users/minhak/Development/Final%20Project/Cantabile/assets/Brahms_-_Symphony_No1_in_C_Op68_(cello-part)a.pdf"
-          }}
-        />
-        {drawerOpen ? <MetronomeDrawer /> : null}
+        {scoreSelected ? (
+          <ScoreReader uri={fileURI} />
+        ) : (
+          <ScoreList
+            toggleFileState={this._toggleFileState}
+            openFile={this._openFile}
+          />
+        )}
+        {drawerOpen ? (
+          <MetronomeDrawer toggleDrawer={this._toggleDrawer} />
+        ) : null}
       </View>
     );
   }
@@ -53,7 +95,6 @@ export default class LinksScreen extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    height: height
+    flex: 1
   }
 });

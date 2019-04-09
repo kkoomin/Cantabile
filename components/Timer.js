@@ -1,15 +1,50 @@
 import React from "react";
-import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  AsyncStorage
+} from "react-native";
+import DateFormat from "../constants/DateFormat";
 
 export default class Timer extends React.Component {
   state = {
+    timers: [],
     setIntervalId: 0,
+    isCounting: false,
     hour: 0,
     min: 0,
-    sec: 0
+    sec: 0,
+    isCurrentLoaded: false
+  };
+
+  // componentDidMount() {
+  //   this._getCurrent();
+  // }
+
+  // _getCurrent = async () => {
+  //   try {
+  //     const hour = await AsyncStorage.getItem("hour");
+  //     const min = await AsyncStorage.getItem("min");
+  //     const sec = await AsyncStorage.getItem("sec");
+  //     this.setState({
+  //       isCurrentLoaded: true,
+  //       hour: hour || 0,
+  //       min: min || 0,
+  //       sec: sec || 0
+  //     });
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
+
+  _toggleTimer = () => {
+    this.setState({ isCounting: !this.state.isCounting });
   };
 
   _startTimer = () => {
+    this.setState({ isCounting: true });
     this.state.setIntervalId = setInterval(() => {
       if (this.state.sec < 59) {
         return this.setState({ sec: this.state.sec + 1 });
@@ -22,18 +57,48 @@ export default class Timer extends React.Component {
   };
 
   _stopTimer = () => {
-    // console.log("stop");
-    clearInterval(this.state.setIntervalId);
+    this.setState({ isCounting: false }, () => {
+      clearInterval(this.state.setIntervalId);
+    });
   };
 
   _resetTimer = () => {
-    // console.log("clear");
     clearInterval(this.setIntervalId);
     this.setState({ hour: 0, min: 0, sec: 0 });
   };
 
+  _saveTimer = () => {
+    let timers = this.state.timers;
+    const newTimer = {
+      date: DateFormat.scheduleDate(this.props.currentDay),
+      hours:
+        (this.state.hour < 10 ? `0${this.state.hour}` : this.state.hour) +
+        ":" +
+        (this.state.min < 10 ? `0${this.state.min}` : this.state.min) +
+        ":" +
+        (this.state.sec < 10 ? `0${this.state.sec}` : this.state.sec)
+    };
+    let newTimers = timers.find(timer => timer.date === newTimer.date)
+      ? timers.map(timer => {
+          if (timer.date === newTimer.date) {
+            timer = newTimer;
+          }
+          return timer;
+        })
+      : timers.concat(newTimer);
+    this.setState({ timers: newTimers }, () => {
+      this._saveTimerInStorage(this.state.timers);
+    });
+  };
+
+  _saveTimerInStorage = timers => {
+    AsyncStorage.setItem("timers", JSON.stringify(timers), () =>
+      this.props.handleTimerSave()
+    );
+  };
+
   render() {
-    const { hour, min, sec } = this.state;
+    const { hour, min, sec, isCounting } = this.state;
 
     return (
       <View style={styles.container}>
@@ -48,23 +113,32 @@ export default class Timer extends React.Component {
         </View>
 
         <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[styles.button, styles.startBtn]}
-            onPress={this._startTimer}
-          >
-            <Text>Start</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, styles.stopBtn]}
-            onPress={this._stopTimer}
-          >
-            <Text>Stop</Text>
-          </TouchableOpacity>
+          {isCounting ? (
+            <TouchableOpacity
+              style={[styles.button, styles.stopBtn]}
+              onPress={this._stopTimer}
+            >
+              <Text style={styles.buttonText}>Pause</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={[styles.button, styles.startBtn]}
+              onPress={this._startTimer}
+            >
+              <Text style={styles.buttonText}>Start</Text>
+            </TouchableOpacity>
+          )}
           <TouchableOpacity
             style={[styles.button, styles.resetBtn]}
             onPress={this._resetTimer}
           >
-            <Text>Reset</Text>
+            <Text style={styles.buttonText}>Reset</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, styles.saveBtn]}
+            onPress={this._saveTimer}
+          >
+            <Text style={styles.buttonText}>Save</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -74,7 +148,6 @@ export default class Timer extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     alignItems: "center"
   },
   timerContainer: {
@@ -95,7 +168,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between"
   },
   button: {
-    margin: 10,
-    padding: 5
+    margin: 5,
+    padding: 5,
+    paddingLeft: 20,
+    paddingRight: 20
+  },
+  buttonText: {
+    fontSize: 20
   }
 });

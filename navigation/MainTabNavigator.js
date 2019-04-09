@@ -22,6 +22,7 @@ CalendarStack.navigationOptions = {
     inactiveTintColor: "#ccc",
     labelStyle: { fontSize: 15 }
   },
+  tabBarVisible: true,
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
@@ -40,6 +41,7 @@ ScoreStack.navigationOptions = {
     activeTintColor: "#910D01",
     inactiveTintColor: "#ccc"
   },
+  tabBarVisible: true,
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
@@ -58,6 +60,7 @@ LogStack.navigationOptions = {
     activeTintColor: "#910D01",
     inactiveTintColor: "#ccc"
   },
+  tabBarVisible: true,
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
@@ -76,6 +79,7 @@ SettingsStack.navigationOptions = {
     activeTintColor: "#910D01",
     inactiveTintColor: "#ccc"
   },
+  tabBarVisible: true,
   tabBarIcon: ({ focused }) => (
     <TabBarIcon
       focused={focused}
@@ -85,8 +89,8 @@ SettingsStack.navigationOptions = {
 };
 
 export default createBottomTabNavigator({
-  CalendarStack,
   ScoreStack,
+  CalendarStack,
   LogStack,
   SettingsStack
 });

@@ -29,13 +29,12 @@ npm start
 ## Project Schedule
 
 - MVP features  
-  [ ] calendar schedule add form  
-  [ ] calendar schedule edit / delete  
-  [ ] score list rendering  
+  [v] calendar schedule add form  
+  [v] calendar schedule edit / delete  
+  [v] score list rendering  
   [ ] Metronome  
   [v] timer  
-  [ ] daily to do list
-  [ ] Login
+  [v] daily to do list
 
 - Final version features
 
@@ -46,19 +45,6 @@ npm start
   [ ] practice counter coloring game
 
 - Which features you plan on having done on which days
-
-## Domain
-
-- Models and schema  
-  User  
-  Score  
-  Date  
-  Schedule  
-  ToDo
-
-* Relationships (has_many/belongs_to)  
-   User: has_many: Score, Date / has_many: Schedule, ToDo, through: :Date  
-   Date: has_many: Schedule, ToDo
 
 ## Wire-Frames
 

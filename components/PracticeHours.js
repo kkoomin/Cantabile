@@ -6,7 +6,9 @@ export default class PracticeHours extends React.Component {
     const { data } = this.props;
     return (
       <View style={styles.practiceHours}>
-        <Text style={styles.practiceHoursTitle}>{data.hours}</Text>
+        <Text style={styles.practiceHoursTitle}>
+          {data === undefined ? "No practice on this day" : data.hours}
+        </Text>
       </View>
     );
   }
