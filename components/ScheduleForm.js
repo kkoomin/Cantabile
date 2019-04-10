@@ -143,7 +143,9 @@ const styles = StyleSheet.create({
   closeBtnContainer: {
     position: "absolute",
     bottom: "20%",
-    alignSelf: "center"
+    alignSelf: "center",
+    alignItems: "center",
+    width: 50
   }
 });
 

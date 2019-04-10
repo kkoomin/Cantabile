@@ -15,7 +15,7 @@ export default class MetronomeDrawer extends React.Component {
         onRequestClose={toggleDrawer}
       >
         <TouchableOpacity onPress={toggleDrawer}>
-          <View style={{ height: "50%" }} />
+          <View style={{ height: "70%" }} />
         </TouchableOpacity>
         <View style={styles.container}>
           <Metronome />
@@ -23,7 +23,11 @@ export default class MetronomeDrawer extends React.Component {
             style={styles.closeBtnContainer}
             onPress={toggleDrawer}
           >
-            <Icon.Ionicons name={"ios-close-circle-outline"} size={40} />
+            <Icon.Ionicons
+              name={"ios-close-circle-outline"}
+              size={40}
+              color={"white"}
+            />
           </TouchableOpacity>
         </View>
       </Modal>
@@ -34,9 +38,9 @@ export default class MetronomeDrawer extends React.Component {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",
-    height: "50%",
+    height: "30%",
     width: "100%",
-    padding: Layout.window.width * 0.05,
+    // padding: Layout.window.width * 0.05,
     position: "absolute",
     alignSelf: "center",
     bottom: 0,

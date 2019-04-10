@@ -7,6 +7,7 @@ import {
   AsyncStorage
 } from "react-native";
 import DateFormat from "../constants/DateFormat";
+import Layout from "../constants/Layout";
 
 export default class Timer extends React.Component {
   state = {
@@ -165,15 +166,15 @@ const styles = StyleSheet.create({
     borderRightWidth: 2,
     borderBottomWidth: 2,
     flexDirection: "row",
-    justifyContent: "space-between"
+    justifyContent: "space-around"
   },
   button: {
     margin: 5,
     padding: 5,
-    paddingLeft: 20,
-    paddingRight: 20
+    width: Layout.window.width * 0.15
   },
   buttonText: {
+    alignSelf: "center",
     fontSize: 20
   }
 });

@@ -2,7 +2,7 @@ import React from "react";
 import {
   View,
   Text,
-  Button,
+  Alert,
   TouchableOpacity,
   StyleSheet,
   ScrollView,
@@ -16,6 +16,7 @@ import uuidv1 from "uuid/v1";
 
 export default class ScoreList extends React.Component {
   state = {
+    newId: uuidv1(),
     composer: null,
     title: null,
     comment: null,
@@ -75,9 +76,9 @@ export default class ScoreList extends React.Component {
         return;
       } else if (picked.type === "success") {
         console.log(picked.uri);
-        const fileUri = `${FileSystem.documentDirectory}${
-          this.state.composer
-        }-${this.state.title}.pdf`;
+        const fileUri = `${FileSystem.documentDirectory}-${
+          this.state.newId
+        }.pdf`;
         const downloaded = await FileSystem.downloadAsync(picked.uri, fileUri);
         // const read = await FileSystem.readAsStringAsync(downloaded.uri);
         // const json = JSON.parse(read);
@@ -93,31 +94,42 @@ export default class ScoreList extends React.Component {
 
   _handleSubmit = () => {
     // add new score object
-    const newId = uuidv1();
-    const newScore = {
-      id: newId,
-      composer: this.state.composer,
-      title: this.state.title,
-      comment: this.state.comment,
-      fileUri: this.state.fileUri
-    };
+    if (this.state.fileUri) {
+      const newScore = {
+        id: this.state.newId,
+        composer: this.state.composer,
+        title: this.state.title,
+        comment: this.state.comment,
+        fileUri: this.state.fileUri
+      };
 
-    let newScores = this.state.scores.concat(newScore);
-    this.setState(
-      {
-        scores: newScores,
-        formOpened: false,
-        composer: "",
-        title: "",
-        comment: "",
-        fileUri: null
-      },
-      () => {
-        this._saveScores(this.state.scores);
-      }
-    );
+      let newScores = this.state.scores.concat(newScore);
+      this.setState(
+        {
+          scores: newScores,
+          formOpened: false,
+          composer: "",
+          title: "",
+          comment: "",
+          fileUri: null
+        },
+        () => {
+          this._saveScores(this.state.scores);
+        }
+      );
+    } else {
+      this._showAlert();
+    }
   };
 
+  _showAlert = () => {
+    Alert.alert(
+      "Alert",
+      "Please select the score",
+      [{ text: "OK", onPress: () => console.log("OK Pressed") }],
+      { cancelable: false }
+    );
+  };
   _saveScores = scores => {
     AsyncStorage.setItem("scores", JSON.stringify(scores));
   };

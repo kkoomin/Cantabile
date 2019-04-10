@@ -36,58 +36,60 @@ export default class ScoreForm extends Component {
         animationType="slide"
         onRequestClose={toggleForm}
       >
-        <TouchableOpacity style={styles.closeBtnContainer} onPress={toggleForm}>
-          <Icon.Ionicons name={"ios-close-circle-outline"} size={40} />
-        </TouchableOpacity>
+        <ScrollView contentContainerStyle={styles.container}>
+          <Text style={styles.formTitle}>Add New Score</Text>
+          <TextInput
+            style={styles.formInput}
+            multiline={true}
+            returnKeyType={"done"}
+            placeholder="Composer"
+            placeholderTextColor={"#999"}
+            value={composer}
+            onChangeText={text => changeComposer(text)}
+          />
+          <TextInput
+            style={[styles.formInput, styles.textArea]}
+            multiline={true}
+            returnKeyType={"done"}
+            placeholder="Title"
+            placeholderTextColor={"#999"}
+            value={title}
+            onChangeText={text => changeTitle(text)}
+          />
+          <TextInput
+            style={[styles.formInput, styles.textArea]}
+            multiline={true}
+            returnKeyType={"done"}
+            placeholder="Additional Comment for this score"
+            placeholderTextColor={"#999"}
+            value={comment}
+            onChangeText={text => changeComment(text)}
+          />
+          <TouchableOpacity style={styles.chooseFileBtn} onPress={chooseFile}>
+            <Text style={{ fontSize: 18, alignSelf: "center" }}>
+              {isFileUploaded ? "File Uploaded" : "Select Score"}
+            </Text>
+            <Icon.Ionicons
+              name={"ios-arrow-down"}
+              size={30}
+              style={{ marginTop: 5 }}
+            />
+          </TouchableOpacity>
 
-        <View style={styles.container}>
-          {/* <Text style={styles.formTitle}>Add New Score</Text> */}
-          <ScrollView contentContainerStyle={styles.innerContainer}>
-            <TextInput
-              style={styles.formInput}
-              multiline={true}
-              returnKeyType={"done"}
-              placeholder="Composer"
-              placeholderTextColor={"#999"}
-              value={composer}
-              onChangeText={text => changeComposer(text)}
-            />
-            <TextInput
-              style={[styles.formInput, styles.textArea]}
-              multiline={true}
-              returnKeyType={"done"}
-              placeholder="Title"
-              placeholderTextColor={"#999"}
-              value={title}
-              onChangeText={text => changeTitle(text)}
-            />
-            <TextInput
-              style={[styles.formInput, styles.textArea]}
-              multiline={true}
-              returnKeyType={"done"}
-              placeholder="Additional Comment for this score"
-              placeholderTextColor={"#999"}
-              value={comment}
-              onChangeText={text => changeComment(text)}
-            />
-            <TouchableOpacity style={styles.chooseFileBtn} onPress={chooseFile}>
-              <Text style={{ fontSize: 18, alignSelf: "center" }}>
-                {isFileUploaded ? "File Uploaded" : "Select Score"}
-              </Text>
-              <Icon.Ionicons
-                name={"ios-arrow-down"}
-                size={30}
-                style={{ marginTop: 5 }}
-              />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.selectScoreConfirm}
-              onPress={handleSubmit}
-            >
-              <Text style={styles.selectScoreConfirmBtn}>Confirm</Text>
-            </TouchableOpacity>
-          </ScrollView>
+          <TouchableOpacity
+            style={styles.selectScoreConfirm}
+            onPress={handleSubmit}
+          >
+            <Text style={styles.selectScoreConfirmBtn}>Confirm</Text>
+          </TouchableOpacity>
+        </ScrollView>
+        <View>
+          <TouchableOpacity
+            style={styles.closeBtnContainer}
+            onPress={toggleForm}
+          >
+            <Icon.Ionicons name={"ios-close-circle-outline"} size={40} />
+          </TouchableOpacity>
         </View>
       </Modal>
     );
@@ -135,12 +137,16 @@ const styles = StyleSheet.create({
     alignSelf: "center"
   },
   selectScoreConfirmBtn: {
-    fontSize: 18
+    fontSize: 18,
+    color: "#910D01"
   },
   closeBtnContainer: {
     position: "absolute",
-    bottom: "20%",
-    alignSelf: "center"
+    bottom: Layout.window.height * 0.15,
+    alignSelf: "center",
+    alignItems: "center",
+    width: 50
+    // backgroundColor: "red"
   },
   chooseFileBtn: {
     padding: 5,

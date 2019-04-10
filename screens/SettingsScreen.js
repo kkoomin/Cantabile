@@ -1,12 +1,12 @@
 import React from "react";
-import Setting from "../components/Setting";
+import Tuner from "../components/Tuner";
 
 export default class SettingsScreen extends React.Component {
   static navigationOptions = {
-    title: "Setting"
+    title: "Tuner"
   };
 
   render() {
-    return <Setting />;
+    return <Tuner />;
   }
 }

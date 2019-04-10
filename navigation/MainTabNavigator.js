@@ -4,7 +4,8 @@ import {
   createStackNavigator,
   createBottomTabNavigator
 } from "react-navigation";
-
+import { Icon } from "expo";
+import Colors from "../constants/Colors";
 import TabBarIcon from "../components/TabBarIcon";
 import CalendarScreen from "../screens/CalendarScreen";
 import ScoreScreen from "../screens/ScoreScreen";
@@ -39,7 +40,8 @@ ScoreStack.navigationOptions = {
   tabBarLabel: "Score",
   tabBarOptions: {
     activeTintColor: "#910D01",
-    inactiveTintColor: "#ccc"
+    inactiveTintColor: "#ccc",
+    labelStyle: { fontSize: 15 }
   },
   tabBarVisible: true,
   tabBarIcon: ({ focused }) => (
@@ -58,7 +60,8 @@ LogStack.navigationOptions = {
   tabBarLabel: "Log",
   tabBarOptions: {
     activeTintColor: "#910D01",
-    inactiveTintColor: "#ccc"
+    inactiveTintColor: "#ccc",
+    labelStyle: { fontSize: 15 }
   },
   tabBarVisible: true,
   tabBarIcon: ({ focused }) => (
@@ -70,27 +73,31 @@ LogStack.navigationOptions = {
 };
 
 const SettingsStack = createStackNavigator({
-  Settings: SettingsScreen
+  Tuner: SettingsScreen
 });
 
 SettingsStack.navigationOptions = {
-  tabBarLabel: "Settings",
+  tabBarLabel: "Tuner",
   tabBarOptions: {
     activeTintColor: "#910D01",
-    inactiveTintColor: "#ccc"
+    inactiveTintColor: "#ccc",
+    labelStyle: { fontSize: 15 }
   },
   tabBarVisible: true,
   tabBarIcon: ({ focused }) => (
-    <TabBarIcon
+    <Icon.MaterialCommunityIcons
       focused={focused}
-      name={Platform.OS === "ios" ? "ios-options" : "md-options"}
+      name={"tune-vertical"}
+      size={26}
+      style={{ marginBottom: -3 }}
+      color={focused ? Colors.tabIconSelected : Colors.tabIconDefault}
     />
   )
 };
 
 export default createBottomTabNavigator({
+  LogStack,
   ScoreStack,
   CalendarStack,
-  LogStack,
   SettingsStack
 });
