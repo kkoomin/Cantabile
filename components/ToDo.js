@@ -52,7 +52,6 @@ export default class ToDo extends React.Component {
             <TouchableOpacity>
               <TextInput
                 style={[styles.text, styles.todoEditText]}
-                multiline={true}
                 autoFocus={true}
                 value={this.state.content}
                 onChangeText={this._handleInput}

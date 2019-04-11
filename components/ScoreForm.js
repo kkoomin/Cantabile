@@ -40,7 +40,6 @@ export default class ScoreForm extends Component {
           <Text style={styles.formTitle}>Add New Score</Text>
           <TextInput
             style={styles.formInput}
-            multiline={true}
             returnKeyType={"done"}
             placeholder="Composer"
             placeholderTextColor={"#999"}
@@ -49,7 +48,6 @@ export default class ScoreForm extends Component {
           />
           <TextInput
             style={[styles.formInput, styles.textArea]}
-            multiline={true}
             returnKeyType={"done"}
             placeholder="Title"
             placeholderTextColor={"#999"}

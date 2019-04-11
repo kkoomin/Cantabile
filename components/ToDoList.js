@@ -18,7 +18,6 @@ export default class ToDoList extends React.Component {
   };
 
   componentDidMount = () => {
-    // AsyncStorage.clear();
     this._getToDos();
   };
 
@@ -104,6 +103,7 @@ export default class ToDoList extends React.Component {
 
   render() {
     const { toDos, newToDoText } = this.state;
+
     return (
       <View style={styles.container}>
         <View style={styles.inputContainer}>

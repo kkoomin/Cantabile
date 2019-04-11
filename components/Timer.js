@@ -4,7 +4,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   Text,
-  AsyncStorage
+  AsyncStorage,
+  Alert
 } from "react-native";
 import DateFormat from "../constants/DateFormat";
 import Layout from "../constants/Layout";
@@ -19,26 +20,6 @@ export default class Timer extends React.Component {
     sec: 0,
     isCurrentLoaded: false
   };
-
-  // componentDidMount() {
-  //   this._getCurrent();
-  // }
-
-  // _getCurrent = async () => {
-  //   try {
-  //     const hour = await AsyncStorage.getItem("hour");
-  //     const min = await AsyncStorage.getItem("min");
-  //     const sec = await AsyncStorage.getItem("sec");
-  //     this.setState({
-  //       isCurrentLoaded: true,
-  //       hour: hour || 0,
-  //       min: min || 0,
-  //       sec: sec || 0
-  //     });
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
 
   _toggleTimer = () => {
     this.setState({ isCounting: !this.state.isCounting });
@@ -69,27 +50,64 @@ export default class Timer extends React.Component {
   };
 
   _saveTimer = () => {
-    let timers = this.state.timers;
+    let timers = this.props.timers;
     const newTimer = {
       date: DateFormat.scheduleDate(this.props.currentDay),
-      hours:
-        (this.state.hour < 10 ? `0${this.state.hour}` : this.state.hour) +
-        ":" +
-        (this.state.min < 10 ? `0${this.state.min}` : this.state.min) +
-        ":" +
-        (this.state.sec < 10 ? `0${this.state.sec}` : this.state.sec)
+      hour: this.state.hour < 10 ? `0${this.state.hour}` : this.state.hour,
+      min: this.state.min < 10 ? `0${this.state.min}` : this.state.min,
+      sec: this.state.sec < 10 ? `0${this.state.sec}` : this.state.sec
     };
-    let newTimers = timers.find(timer => timer.date === newTimer.date)
-      ? timers.map(timer => {
-          if (timer.date === newTimer.date) {
-            timer = newTimer;
-          }
-          return timer;
-        })
-      : timers.concat(newTimer);
+
+    let newTimers;
+    if (timers.find(timer => timer.date === newTimer.date)) {
+      newTimers = timers.map(timer => {
+        if (timer.date === newTimer.date) {
+          newTimer.sec = parseInt(newTimer.sec) + parseInt(timer.sec);
+          newTimer.min =
+            newTimer.sec < 60
+              ? parseInt(newTimer.min) + parseInt(timer.min)
+              : parseInt(newTimer.min) + parseInt(timer.min) + 1;
+          newTimer.hour =
+            newTimer.min < 60
+              ? parseInt(newTimer.hour) + parseInt(timer.hour)
+              : parseInt(newTimer.hour) + parseInt(timer.hour) + 1;
+
+          newTimer.sec > 60 ? newTimer.sec - 60 : newTimer.sec;
+          newTimer.min > 60 ? newTimer.min - 60 : newTimer.min;
+
+          newTimer.sec = newTimer.sec < 10 ? `0${newTimer.sec}` : newTimer.sec;
+          newTimer.min = newTimer.min < 10 ? `0${newTimer.min}` : newTimer.min;
+          newTimer.hour =
+            newTimer.hour < 10 ? `0${newTimer.hour}` : newTimer.hour;
+
+          timer = newTimer;
+        }
+        return timer;
+      });
+    } else {
+      newTimers = timers.concat(newTimer);
+    }
+
     this.setState({ timers: newTimers }, () => {
       this._saveTimerInStorage(this.state.timers);
     });
+
+    Alert.alert(
+      "Alert",
+      "Saved! Do you want to reset the timer?",
+      [
+        {
+          text: "Reset",
+          onPress: () => this._resetTimer()
+        },
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        }
+      ],
+      { cancelable: false }
+    );
   };
 
   _saveTimerInStorage = timers => {

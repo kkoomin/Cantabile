@@ -8,7 +8,6 @@ import {
   Keyboard
 } from "react-native";
 import { Icon } from "expo";
-import MetronomeDrawer from "../components/MetronomeDrawer";
 import ScoreList from "../components/ScoreList";
 import ScoreReader from "../components/ScoreReader";
 
@@ -26,16 +25,6 @@ export default class ScoreScreen extends React.Component {
             onPress={() => params.toggleFileState()}
           />
         </TouchableOpacity>
-      ),
-      headerRight: (
-        <TouchableOpacity style={{ width: 40, height: "100%" }}>
-          <Icon.MaterialCommunityIcons
-            name={"metronome"}
-            size={28}
-            style={{ marginRight: 10, marginTop: 5 }}
-            onPress={() => params.toggleDrawer()}
-          />
-        </TouchableOpacity>
       )
     };
   };
@@ -43,20 +32,19 @@ export default class ScoreScreen extends React.Component {
   state = {
     scores: null,
     scoreSelected: false,
-    fileURI: null,
-    drawerOpen: false
+    fileURI: null
   };
 
   componentDidMount() {
     this.props.navigation.setParams({
-      toggleDrawer: this._toggleDrawer,
+      togglePlaying: this._togglePlaying,
       toggleFileState: this._toggleFileState,
       scoreOpened: false
     });
   }
 
-  _toggleDrawer = () => {
-    this.setState({ drawerOpen: !this.state.drawerOpen });
+  _togglePlaying = () => {
+    this.props.screenProps.togglePlaying();
   };
 
   _toggleFileState = () => {
@@ -85,9 +73,6 @@ export default class ScoreScreen extends React.Component {
             openFile={this._openFile}
           />
         )}
-        {drawerOpen ? (
-          <MetronomeDrawer toggleDrawer={this._toggleDrawer} />
-        ) : null}
       </View>
     );
   }

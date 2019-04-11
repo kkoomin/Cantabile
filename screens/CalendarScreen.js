@@ -16,6 +16,7 @@ import DateFormat from "../constants/DateFormat";
 import Layout from "../constants/Layout";
 import PracticeHours from "../components/PracticeHours";
 import uuidv1 from "uuid/v1";
+import CalendarContainer from "../components/CalendarContainer";
 
 export default class CalendarScreen extends React.Component {
   static navigationOptions = () => {
@@ -26,17 +27,19 @@ export default class CalendarScreen extends React.Component {
 
   state = {
     // fontLoaded: false,
-    // weekSelect: false,
-    selectedDateObj: null, // Line 100
+    selectedDateObj: null, // Line 149 format
     selectedDateString: undefined, // ex) "2019-04-01"
 
     formOpened: false,
     detailOpened: false,
 
+    selectedDateObj: null,
     selectedSchedule: null,
 
     schedules: [],
-    isSchedulesLoaded: false
+    isSchedulesLoaded: false,
+
+    markedDates: {}
   };
 
   componentDidMount() {
@@ -47,19 +50,25 @@ export default class CalendarScreen extends React.Component {
     //   "space-mono": require("../assets/fonts/SpaceMono-Regular.ttf")
     // });
     // AsyncStorage.clear();
-    this.setState({
-      fontLoaded: true,
-      selectedDateObj: {
-        [DateFormat.scheduleDate(current_datetime)]: {
-          selected: true,
-          marked: false,
-          selectedColor: "#B83925",
-          date: DateFormat.scheduleDate(current_datetime)
-        }
-      },
-      selectedDateString: DateFormat.scheduleDate(current_datetime)
+    this._getSchedules().then(() => {
+      this.setState({
+        fontLoaded: true,
+        selectedDateObj: {
+          [DateFormat.scheduleDate(current_datetime)]: {
+            selected: true,
+            selectedColor: "#910D01",
+            marked: Object.keys(this.state.markedDates).includes(
+              DateFormat.scheduleDate(current_datetime)
+            )
+              ? true
+              : false,
+            dotColor: "white",
+            date: DateFormat.scheduleDate(current_datetime)
+          }
+        },
+        selectedDateString: DateFormat.scheduleDate(current_datetime)
+      });
     });
-    this._getSchedules();
   }
 
   // TOGGLE STATES
@@ -125,10 +134,26 @@ export default class CalendarScreen extends React.Component {
     try {
       const schedules = await AsyncStorage.getItem("schedules");
       const parsedSchedules = JSON.parse(schedules);
-      this.setState({
-        isSchedulesLoaded: true,
-        schedules: parsedSchedules || []
-      });
+      this.setState(
+        {
+          isSchedulesLoaded: true,
+          schedules: parsedSchedules || []
+        },
+        () => {
+          let markedDates = {};
+          this.state.schedules.map(schedule => {
+            markedDates[schedule.date] = {
+              selected: false,
+              marked: true,
+              dotColor: "#B83925",
+              date: schedule.date
+            };
+          });
+          this.setState({
+            markedDates: markedDates
+          });
+        }
+      );
     } catch (err) {
       console.log(err);
     }
@@ -141,6 +166,33 @@ export default class CalendarScreen extends React.Component {
     this._toggleScheduleDetail();
   };
 
+  // Calendar Function
+  _onDayPress = day => {
+    this.setState(
+      {
+        selectedDateObj: {
+          [day.dateString]: {
+            selected: true,
+            selectedColor: "#B83925",
+            marked: Object.keys(this.state.markedDates).includes(day.dateString)
+              ? true
+              : false,
+            dotColor: "white",
+            date: day.dateString
+          }
+        },
+        selectedDateString: day.dateString
+      },
+      () => {
+        console.log(this.state.selectedDateObj);
+      }
+    );
+  };
+
+  _onMonthChange = () => {
+    this.setState({ selectedDateObj: null });
+  };
+
   render() {
     const {
       formOpened,
@@ -149,7 +201,8 @@ export default class CalendarScreen extends React.Component {
       selectedDateString,
       selectedSchedule,
       schedules,
-      isSchedulesLoaded
+      isSchedulesLoaded,
+      markedDates
     } = this.state;
 
     return (
@@ -160,55 +213,11 @@ export default class CalendarScreen extends React.Component {
         ]}
       >
         {this.state.fontLoaded && !detailOpened && !formOpened ? (
-          <Calendar
-            onDayPress={day => {
-              this.setState(
-                {
-                  selectedDateObj: {
-                    [day.dateString]: {
-                      selected: true,
-                      marked: false,
-                      selectedColor: "#B83925",
-                      date: day.dateString
-                    }
-                  },
-                  selectedDateString: day.dateString
-                },
-                () => {
-                  console.log(selectedDateObj);
-                }
-              );
-            }}
-            markedDates={selectedDateObj}
-            onMonthChange={() => this.setState({ selectedDateObj: null })}
-            monthFormat={"yyyy / MM"}
-            hideExtraDays={true}
-            disableMonthChange={true}
-            firstDay={0} // week starts from Sunday.
-            onPressArrowLeft={substractMonth => substractMonth()}
-            onPressArrowRight={addMonth => addMonth()}
-            style={styles.calendar}
-            theme={{
-              backgroundColor: "#ffffff",
-              calendarBackground: "#ffffff",
-              textSectionTitleColor: "#b6c1cd",
-              selectedDayBackgroundColor: "#00adf5",
-              selectedDayTextColor: "#ffffff",
-              todayTextColor: "#00adf5",
-              dayTextColor: "#2d4150",
-              textDisabledColor: "#d9e1e8",
-              dotColor: "#00adf5",
-              selectedDotColor: "#ffffff",
-              arrowColor: "black",
-              monthTextColor: "#910D01",
-              // textDayFontFamily: "space-mono",
-              // textMonthFontFamily: "space-mono",
-              // textDayHeaderFontFamily: "space-mono",
-              textMonthFontWeight: "bold",
-              textDayFontSize: 16,
-              textMonthFontSize: 20,
-              textDayHeaderFontSize: 16
-            }}
+          <CalendarContainer
+            selectedDateObj={selectedDateObj}
+            markedDates={markedDates}
+            onDayPress={this._onDayPress}
+            onMonthChange={this._onMonthChange}
           />
         ) : null}
         {!formOpened && !detailOpened ? (
@@ -222,7 +231,6 @@ export default class CalendarScreen extends React.Component {
                   )}
                 />
               ) : null}
-
               <ScrollView>
                 {selectedDateObj && isSchedulesLoaded
                   ? schedules

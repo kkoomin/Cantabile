@@ -1,13 +1,14 @@
 import React, { Component } from "react";
 import { Text, View, StyleSheet, TouchableOpacity, Slider } from "react-native";
-import { Audio } from "expo";
+import { Icon, Audio } from "expo";
+import Layout from "../constants/Layout";
 
 //와 이게 플레이 되기는하네 ^^..
 //https://snack.expo.io/BkX2ZNfmG
 const source = require("../assets/Woodblock.wav");
 export default class Metronome extends Component {
   state = {
-    playingStatus: "Stop",
+    playingStatus: "Play",
     setIntervalID: 0,
     bpm: 60,
     sound: null
@@ -37,21 +38,21 @@ export default class Metronome extends Component {
 
   _playAndPause = () => {
     switch (this.state.playingStatus) {
-      case "Stop":
+      case "Play":
         this.setState({
-          playingStatus: "Playing"
+          playingStatus: "Stop"
         });
         this._timer();
         break;
-      case "Playing":
-        this.setState({ playingStatus: "Stop" });
+      case "Stop":
+        this.setState({ playingStatus: "Play" });
         this._stop();
         break;
     }
   };
 
   _handleBpmChange = value => {
-    this.setState({ bpm: value, playingStatus: "Stop" }, () => {
+    this.setState({ bpm: value, playingStatus: "Play" }, () => {
       this._stop();
     });
   };
@@ -59,6 +60,11 @@ export default class Metronome extends Component {
   render() {
     return (
       <View style={styles.container}>
+        <Icon.MaterialCommunityIcons
+          name={"metronome"}
+          size={100}
+          style={{ margin: 5 }}
+        />
         <TouchableOpacity style={styles.button} onPress={this._playAndPause}>
           <Text style={styles.buttonText}>{this.state.playingStatus}</Text>
         </TouchableOpacity>
@@ -73,7 +79,7 @@ export default class Metronome extends Component {
           step="5"
         />
         <Text style={{ fontSize: 20, color: "white" }}>
-          {this.state.bpm}bpm
+          {this.state.bpm} bpm
         </Text>
       </View>
     );
@@ -82,7 +88,7 @@ export default class Metronome extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    height: Layout.window.height * 0.3,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#910D01"

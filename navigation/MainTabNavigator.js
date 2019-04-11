@@ -73,11 +73,11 @@ LogStack.navigationOptions = {
 };
 
 const SettingsStack = createStackNavigator({
-  Tuner: SettingsScreen
+  Setting: SettingsScreen
 });
 
 SettingsStack.navigationOptions = {
-  tabBarLabel: "Tuner",
+  tabBarLabel: "Setting",
   tabBarOptions: {
     activeTintColor: "#910D01",
     inactiveTintColor: "#ccc",

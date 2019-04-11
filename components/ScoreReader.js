@@ -1,5 +1,6 @@
 import React from "react";
 import { Text, StyleSheet, View, Dimensions, WebView } from "react-native";
+import { KeepAwake } from "expo";
 import PDFReader from "rn-pdf-reader-js";
 
 const { height } = Dimensions.get("window").height;
@@ -18,6 +19,7 @@ export default class ScoreReader extends React.Component {
   render() {
     return (
       <View style={styles.container}>
+        <KeepAwake />
         <PDFReader
           source={{
             uri: this.props.uri

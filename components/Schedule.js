@@ -91,10 +91,3 @@ const styles = StyleSheet.create({
     // borderWidth: 1
   }
 });
-
-// lined: { 형광펜 효과
-//   padding: 10,
-//   margin: 10,
-//   marginRight: 30,
-//   backgroundColor: "lightpink"
-// }

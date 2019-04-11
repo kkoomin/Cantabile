@@ -86,7 +86,6 @@ export default class ScheduleDetail extends Component {
               <>
                 <TextInput
                   style={styles.content}
-                  // multiline={true}
                   returnKeyType={"done"}
                   placeholder="Schedule Name"
                   placeholderTextColor={"#999"}

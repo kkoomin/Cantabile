@@ -68,7 +68,6 @@ export default class ScheduleForm extends Component {
             >
               <TextInput
                 style={styles.formInput}
-                multiline={true}
                 returnKeyType={"done"}
                 placeholder="Schedule Name"
                 placeholderTextColor={"#999"}

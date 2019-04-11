@@ -30,10 +30,14 @@ export default class ChatScreen extends React.Component {
             </Text>
           </View>
           <Timer
+            timers={this.props.screenProps.timers}
             currentDay={this.state.currentDay}
             handleTimerSave={this.props.screenProps.handleTimerSave}
           />
           <ToDoList />
+          <View style={styles.quoteContainer}>
+            <Text style={styles.quote}>"Practice makes Perfect"</Text>
+          </View>
         </View>
       </TouchableWithoutFeedback>
     );
@@ -53,5 +57,14 @@ const styles = StyleSheet.create({
   logTitle: {
     fontSize: 20,
     margin: 20
+  },
+  quoteContainer: {
+    position: "absolute",
+    bottom: 3,
+    margin: 10
+  },
+  quote: {
+    fontSize: 18,
+    color: "grey"
   }
 });

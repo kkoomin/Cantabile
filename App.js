@@ -11,15 +11,21 @@ import AppNavigator from "./navigation/AppNavigator";
 
 export default class App extends React.Component {
   state = {
-    timers: []
+    timers: [],
+    isMetronomePlaying: false
   };
 
   componentDidMount() {
     this._getTimers();
+    // AsyncStorage.clear();
   }
 
   handleTimerSave = () => {
     this._getTimers();
+  };
+
+  _togglePlaying = () => {
+    this.setState({ isMetronomePlaying: !this.state.isMetronomePlaying });
   };
 
   _getTimers = async () => {
@@ -40,7 +46,11 @@ export default class App extends React.Component {
         <AppNavigator
           screenProps={{
             timers: this.state.timers,
-            handleTimerSave: this.handleTimerSave
+            togglePlaying: this._togglePlaying,
+            handleTimerSave: this.handleTimerSave,
+            isDataDeleted: this.state.isDataDeleted,
+            toggleDataDelete: this._toggleDataDelete,
+            isMetronomePlaying: this.state.isMetronomePlaying
           }}
         />
       </View>
