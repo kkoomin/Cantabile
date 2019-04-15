@@ -62,7 +62,7 @@ export default class ScoreScreen extends React.Component {
   };
 
   render() {
-    const { drawerOpen, scoreSelected, fileURI } = this.state;
+    const { scoreSelected, fileURI } = this.state;
     return (
       <View style={styles.container}>
         {scoreSelected ? (

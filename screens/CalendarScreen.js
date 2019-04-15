@@ -26,7 +26,6 @@ export default class CalendarScreen extends React.Component {
   };
 
   state = {
-    // fontLoaded: false,
     selectedDateObj: null, // Line 149 format
     selectedDateString: undefined, // ex) "2019-04-01"
 

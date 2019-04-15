@@ -1,212 +1,149 @@
 import React from "react";
-import { SectionList, Image, StyleSheet, Text, View } from "react-native";
-import { Constants } from "expo";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Switch,
+  AsyncStorage,
+  Alert
+} from "react-native";
+import Layout from "../constants/Layout";
+import PasswordForm from "./PasswordForm";
 
-export default class ExpoConfigView extends React.Component {
-  render() {
-    const { manifest } = Constants;
-    const sections = [
-      { data: [{ value: manifest.sdkVersion }], title: "sdkVersion" },
-      { data: [{ value: manifest.privacy }], title: "privacy" },
-      { data: [{ value: manifest.version }], title: "version" },
-      { data: [{ value: manifest.orientation }], title: "orientation" },
-      {
-        data: [{ value: manifest.primaryColor, type: "color" }],
-        title: "primaryColor"
-      },
-      {
-        data: [{ value: manifest.splash && manifest.splash.image }],
-        title: "splash.image"
-      },
-      {
-        data: [
-          {
-            value: manifest.splash && manifest.splash.backgroundColor,
-            type: "color"
-          }
-        ],
-        title: "splash.backgroundColor"
-      },
-      {
-        data: [
-          {
-            value: manifest.splash && manifest.splash.resizeMode
-          }
-        ],
-        title: "splash.resizeMode"
-      },
-      {
-        data: [
-          {
-            value:
-              manifest.ios && manifest.ios.supportsTablet ? "true" : "false"
-          }
-        ],
-        title: "ios.supportsTablet"
-      }
-    ];
-
-    return (
-      <SectionList
-        style={styles.container}
-        renderItem={this._renderItem}
-        renderSectionHeader={this._renderSectionHeader}
-        stickySectionHeadersEnabled={true}
-        keyExtractor={(item, index) => index}
-        ListHeaderComponent={ListHeader}
-        sections={sections}
-      />
-    );
-  }
-
-  _renderSectionHeader = ({ section }) => {
-    return <SectionHeader title={section.title} />;
+export default class PersonalSetting extends React.Component {
+  state = {
+    isPasswordOn: false,
+    isRemoveOn: false,
+    isFormOpened: false
   };
 
-  _renderItem = ({ item }) => {
-    if (item.type === "color") {
-      return (
-        <SectionContent>
-          {item.value && <Color value={item.value} />}
-        </SectionContent>
-      );
-    } else {
-      return (
-        <SectionContent>
-          <Text style={styles.sectionContentText}>{item.value}</Text>
-        </SectionContent>
-      );
+  componentDidMount() {
+    this._getPasswordStatus();
+  }
+
+  _getPasswordStatus = async () => {
+    const password = await AsyncStorage.getItem("password");
+    if (password) {
+      const passwordObj = JSON.parse(password);
+      if (passwordObj.isLocked) this.setState({ isPasswordOn: true });
     }
   };
-}
 
-const ListHeader = () => {
-  const { manifest } = Constants;
+  _switchOnChange = () => {
+    if (this.state.isPasswordOn) {
+      this.setState({ isPasswordOn: false });
+      AsyncStorage.removeItem("password");
+    } else {
+      this.setState({ isPasswordOn: true, isFormOpened: true });
+    }
+  };
 
-  return (
-    <View style={styles.titleContainer}>
-      <View style={styles.titleIconContainer}>
-        <AppIconPreview iconUrl={manifest.iconUrl} />
-      </View>
+  _handleSubmit = args => {
+    const passwordObj = {
+      password: `${args.password1}${args.password2}${args.password3}${
+        args.password4
+      }`,
+      isLocked: true
+    };
+    AsyncStorage.setItem("password", JSON.stringify(passwordObj));
+    this._toggleForm();
+  };
 
-      <View style={styles.titleTextContainer}>
-        <Text style={styles.nameText} numberOfLines={1}>
-          {manifest.name}
-        </Text>
+  _toggleForm = () => {
+    this.setState({
+      isFormOpened: !this.state.isFormOpened,
+      isPasswordOn: false
+    });
+  };
 
-        <Text style={styles.slugText} numberOfLines={1}>
-          {manifest.slug}
-        </Text>
+  _removeAlert = () => {
+    Alert.alert(
+      "Warning",
+      "Are you sure you want to remove all data? This process cannot be undone.",
+      [
+        {
+          text: "Confirm",
+          onPress: () => this._removeData()
+        },
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        }
+      ],
+      { cancelable: false }
+    );
+  };
 
-        <Text style={styles.descriptionText}>{manifest.description}</Text>
-      </View>
-    </View>
-  );
-};
+  _removeData = () => {
+    AsyncStorage.clear();
+    this.setState({ isRemoveOn: true });
+    Alert.alert(
+      "Alert",
+      "All data deleted! Please restart the app.",
+      [
+        {
+          text: "OK",
+          onPress: () => console.log("deleted!")
+        }
+      ],
+      { cancelable: false }
+    );
+  };
 
-const SectionHeader = ({ title }) => {
-  return (
-    <View style={styles.sectionHeaderContainer}>
-      <Text style={styles.sectionHeaderText}>{title}</Text>
-    </View>
-  );
-};
+  render() {
+    const { isPasswordOn, isRemoveOn, isFormOpened } = this.state;
 
-const SectionContent = props => {
-  return <View style={styles.sectionContentContainer}>{props.children}</View>;
-};
-
-const AppIconPreview = ({ iconUrl }) => {
-  if (!iconUrl) {
-    iconUrl =
-      "https://s3.amazonaws.com/exp-brand-assets/ExponentEmptyManifest_192.png";
-  }
-
-  return (
-    <Image
-      source={{ uri: iconUrl }}
-      style={{ width: 64, height: 64 }}
-      resizeMode="cover"
-    />
-  );
-};
-
-const Color = ({ value }) => {
-  if (!value) {
-    return <View />;
-  } else {
     return (
-      <View style={styles.colorContainer}>
-        <View style={[styles.colorPreview, { backgroundColor: value }]} />
-        <View style={styles.colorTextContainer}>
-          <Text style={styles.sectionContentText}>{value}</Text>
+      <View style={styles.container}>
+        <Text style={styles.pageTitle}>Personal Setting</Text>
+        <View style={styles.passwordSet}>
+          <Text style={styles.passwordSetTitle}>| Set Password</Text>
+          <Switch onValueChange={this._switchOnChange} value={isPasswordOn} />
         </View>
+        <View style={styles.removeSet}>
+          <Text style={styles.removeDataSetTitle}>| Remove All Data</Text>
+          <Switch onValueChange={this._removeAlert} value={isRemoveOn} />
+        </View>
+
+        {isPasswordOn && isFormOpened ? (
+          <PasswordForm
+            handleSubmit={this._handleSubmit}
+            toggleForm={this._toggleForm}
+          />
+        ) : null}
       </View>
     );
   }
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff"
+    backgroundColor: "#fff",
+    padding: Layout.window.width * 0.05
   },
-  titleContainer: {
-    paddingHorizontal: 15,
-    paddingTop: 15,
-    paddingBottom: 15,
-    flexDirection: "row"
+  pageTitle: {
+    fontSize: 40,
+    alignSelf: "center",
+    marginBottom: Layout.window.height * 0.03
   },
-  titleIconContainer: {
-    marginRight: 15,
-    paddingTop: 2
-  },
-  sectionHeaderContainer: {
-    backgroundColor: "#fbfbfb",
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#ededed"
-  },
-  sectionHeaderText: {
-    fontSize: 14
-  },
-  sectionContentContainer: {
-    paddingTop: 8,
-    paddingBottom: 12,
-    paddingHorizontal: 15
-  },
-  sectionContentText: {
-    color: "#808080",
-    fontSize: 14
-  },
-  nameText: {
-    fontWeight: "600",
-    fontSize: 18
-  },
-  slugText: {
-    color: "#a39f9f",
-    fontSize: 14,
-    backgroundColor: "transparent"
-  },
-  descriptionText: {
-    fontSize: 14,
-    marginTop: 6,
-    color: "#4d4d4d"
-  },
-  colorContainer: {
+  passwordSet: {
+    width: "100%",
+    padding: Layout.window.width * 0.01,
     flexDirection: "row",
-    alignItems: "center"
+    justifyContent: "space-between"
   },
-  colorPreview: {
-    width: 17,
-    height: 17,
-    borderRadius: 2,
-    marginRight: 6,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: "#ccc"
+  removeSet: {
+    width: "100%",
+    padding: Layout.window.width * 0.01,
+    flexDirection: "row",
+    justifyContent: "space-between"
   },
-  colorTextContainer: {
-    flex: 1
+  passwordSetTitle: {
+    fontSize: 30
+  },
+  removeDataSetTitle: {
+    fontSize: 30
   }
 });

@@ -3,15 +3,22 @@ import { Text, View, StyleSheet, TouchableOpacity, Slider } from "react-native";
 import { Icon, Audio } from "expo";
 import Layout from "../constants/Layout";
 
-//와 이게 플레이 되기는하네 ^^..
 //https://snack.expo.io/BkX2ZNfmG
 const source = require("../assets/Woodblock.wav");
+
 export default class Metronome extends Component {
   state = {
     playingStatus: "Play",
     setIntervalID: 0,
     bpm: 60,
     sound: null
+  };
+
+  _timer = () => {
+    let interval = (60 / this.state.bpm) * 1000;
+    this.state.setIntervalID = setInterval(() => {
+      this._play();
+    }, interval);
   };
 
   async _play() {
@@ -27,13 +34,6 @@ export default class Metronome extends Component {
 
   _stop = () => {
     clearInterval(this.state.setIntervalID);
-  };
-
-  _timer = () => {
-    let interval = (60 / this.state.bpm) * 1000;
-    this.state.setIntervalID = setInterval(() => {
-      this._play();
-    }, interval);
   };
 
   _playAndPause = () => {
@@ -69,7 +69,7 @@ export default class Metronome extends Component {
           <Text style={styles.buttonText}>{this.state.playingStatus}</Text>
         </TouchableOpacity>
         <Slider
-          style={{ width: 200, height: 40 }}
+          style={{ width: 250, height: 40 }}
           minimumValue={35}
           maximumValue={200}
           minimumTrackTintColor="#FFFFFF"
@@ -88,20 +88,22 @@ export default class Metronome extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    height: Layout.window.height * 0.3,
+    flex: 1,
+    width: "100%",
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#910D01"
   },
   button: {
-    width: 100,
-    height: 100,
+    width: 200,
+    height: 50,
     margin: 5,
     borderRadius: 10,
     backgroundColor: "#fff",
     justifyContent: "center"
   },
   buttonText: {
+    fontSize: 20,
     textAlign: "center",
     backgroundColor: "transparent"
   }

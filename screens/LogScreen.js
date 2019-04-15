@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   logTitle: {
-    fontSize: 20,
+    fontSize: 25,
     margin: 20
   },
   quoteContainer: {

@@ -9,7 +9,7 @@ export default class PracticeHours extends React.Component {
         <Text style={styles.practiceHoursTitle}>
           {data === undefined
             ? "No practice on this day"
-            : `${data.hour}:${data.min}:${data.sec}`}
+            : `Practice Time: ${data.hour}:${data.min}:${data.sec}`}
         </Text>
       </View>
     );
@@ -25,6 +25,7 @@ const styles = StyleSheet.create({
   },
   practiceHoursTitle: {
     fontWeight: "600",
-    fontSize: 25
+    fontSize: 25,
+    color: "grey"
   }
 });

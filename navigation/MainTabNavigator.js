@@ -96,8 +96,8 @@ SettingsStack.navigationOptions = {
 };
 
 export default createBottomTabNavigator({
+  SettingsStack,
   LogStack,
   ScoreStack,
-  CalendarStack,
-  SettingsStack
+  CalendarStack
 });

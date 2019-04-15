@@ -150,6 +150,7 @@ export default class ScoreList extends React.Component {
             <Icon.MaterialCommunityIcons name={"plus-outline"} size={40} />
           </TouchableOpacity>
         </View>
+
         <ScrollView contentContainerStyle={styles.scoreList}>
           {this.state.scores.map(score => (
             <Score

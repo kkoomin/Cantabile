@@ -1,23 +1,28 @@
 import React from "react";
-import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
-import { Audio, Permissions } from "expo";
-import PitchFinder from "pitchfinder";
+import { Text, View, StyleSheet, TouchableOpacity, Slider } from "react-native";
+import { Icon, Audio, Permissions } from "expo";
 import Layout from "../constants/Layout";
 
 export default class Recorder extends React.Component {
   state = {
     isPermitted: false,
     isRecording: false,
-    recording: null,
-    fileUrl: null,
-    isPlaying: false
+    recording: null, // recording obj
+    fileUrl: null, // recorded file url
+    isPlaying: false,
+    isSeeking: false, // playback slider
+    shouldCorrectPitch: true,
+    volume: 1.0,
+    rate: 1.0,
+    muted: false,
+    soundPosition: null,
+    soundDuration: null,
+    recordingDuration: null,
+    shouldPlay: false
   };
 
   componentDidMount() {
     this._getRecordingPermissions();
-    this.setState({
-      pitchFinder: new PitchFinder.YIN({ sampleRate: this.state.sampleRate })
-    });
   }
 
   async _getRecordingPermissions() {
@@ -30,6 +35,17 @@ export default class Recorder extends React.Component {
     } else {
       console.log("error", permissionStatus);
     }
+  }
+
+  _toggleRecording = () => {
+    if (!this.state.isRecording) {
+      this._startRecording();
+    } else {
+      this._stopRecording();
+    }
+  };
+
+  _startRecording = async () => {
     await Audio.setAudioModeAsync({
       playsInSilentModeIOS: true,
       allowsRecordingIOS: true,
@@ -38,9 +54,7 @@ export default class Recorder extends React.Component {
       interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DUCK_OTHERS,
       playThroughEarpieceAndroid: false
     });
-  }
 
-  _recording = async () => {
     const recording = new Audio.Recording();
     recording.setProgressUpdateInterval(200);
 
@@ -51,8 +65,8 @@ export default class Recorder extends React.Component {
 
       if (preparing.canRecord === true) {
         await recording.startAsync(); // You are now recording!
-        console.log("recording");
-        this.setState({ recording: recording });
+        // console.log(recording);
+        this.setState({ recording: recording, isRecording: true });
       }
     } catch (error) {
       console.log(error);
@@ -61,56 +75,203 @@ export default class Recorder extends React.Component {
 
   _stopRecording = async () => {
     try {
-      await this.state.recording.stopAndUnloadAsync();
+      await this.state.recording.stopAndUnloadAsync(); // stop recording
+      const {
+        sound,
+        status
+      } = await this.state.recording.createNewLoadedSoundAsync(
+        {
+          isLooping: true,
+          isMuted: this.state.muted,
+          volume: this.state.volume,
+          rate: this.state.rate,
+          shouldCorrectPitch: this.state.shouldCorrectPitch
+        },
+        this._updateScreenForSoundStatus
+      );
+      // console.log("SOUND AND STATUS", sound, status);
+      this.sound = sound;
+      this.status = status;
+
+      await Audio.setAudioModeAsync({
+        playsInSilentModeIOS: false,
+        allowsRecordingIOS: false, //disable recording
+        interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_MIX_WITH_OTHERS,
+        shouldDuckAndroid: true,
+        interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DUCK_OTHERS,
+        playThroughEarpieceAndroid: false
+      });
+      this.setState({ isRecording: false });
+      // console.log("stop recording");
+      // console.log(this.status.durationMillis); // recorded file seconds
     } catch (error) {
       console.log(error);
     }
-
-    // if (this.state.recording) {
-    //   const fileUrl = this.state.recording.getURI();
-    //   this.state.recording.setOnRecordingStatusUpdate(null);
-    //   this.setState({ recording: null, fileUrl: fileUrl }, () =>
-    //     console.log(this.state.recording, this.state.fileUrl)
-    //   );
-    // }
   };
 
   _play = () => {
-    if (!this.state.isPlaying && this.state.recording !== null) {
-      recorded = this.state.recording.createNewLoadedSoundAsync({
-        shouldPlay: true
-      });
-      this.setState({ isPlaying: true });
-      console.log(recorded);
+    if (this.sound != null) {
+      if (this.state.isPlaying) {
+        this.sound.pauseAsync();
+        console.log("PAUSED");
+        this.setState({ isPlaying: false });
+      } else {
+        this.sound.playAsync();
+        console.log("PAUSE..PLAYED");
+        this.setState({ isPlaying: true });
+      }
     }
-    // } else {
-    //   this.state.recording.stopAsync();
-    //   this.setState({ isPlaying: false });
-    // }
+  };
+
+  _updateScreenForSoundStatus = status => {
+    console.log("UPDATING SCREEN FOR SOUND STATUS", status);
+    if (status.isLoaded) {
+      this.setState({
+        soundDuration: status.durationMillis,
+        soundPosition: status.positionMillis,
+        shouldPlay: status.shouldPlay,
+        isPlaying: status.isPlaying,
+        rate: status.rate,
+        muted: status.isMuted,
+        volume: status.volume,
+        shouldCorrectPitch: status.shouldCorrectPitch,
+        isPlaybackAllowed: true
+      });
+    } else {
+      this.setState({
+        soundDuration: null,
+        soundPosition: null,
+        isPlaybackAllowed: false
+      });
+      if (status.error) {
+        Alert(`FATAL PLAYER ERROR: ${status.error}`);
+      }
+    }
+  };
+
+  _onSliderValueChange = value => {
+    console.log("SEEK SLIDER VALUE", value);
+    if (this.sound != null && !this.isSeeking) {
+      this.isSeeking = true;
+      this.shouldPlayAtEndOfSeek = this.state.shouldPlay;
+      this.sound.pauseAsync();
+    }
+  };
+
+  _onSliderSlidingComplete = async value => {
+    if (this.sound != null) {
+      this.isSeeking = false;
+      const seekPosition = value * this.state.soundDuration;
+      if (this.shouldPlayAtEndOfSeek) {
+        this.sound.playFromPositionAsync(seekPosition);
+      } else {
+        this.sound.setPositionAsync(seekPosition);
+      }
+    }
+  };
+
+  _getSeekSliderPosition() {
+    if (
+      this.sound != null &&
+      this.state.soundPosition != null &&
+      this.state.soundDuration != null
+    ) {
+      return this.state.soundPosition / this.state.soundDuration;
+    }
+    return 0;
+  }
+  _getMMSSFromMillis(millis) {
+    const totalSeconds = millis / 1000;
+    const seconds = Math.floor(totalSeconds % 60);
+    const minutes = Math.floor(totalSeconds / 60);
+
+    const padWithZero = number => {
+      const string = number.toString();
+      if (number < 10) {
+        return "0" + string;
+      }
+      return string;
+    };
+    return padWithZero(minutes) + ":" + padWithZero(seconds);
+  }
+
+  _getPlaybackTimestamp() {
+    if (
+      this.sound != null &&
+      this.state.soundPosition != null &&
+      this.state.soundDuration != null
+    ) {
+      return `${this._getMMSSFromMillis(
+        this.state.soundPosition
+      )} / ${this._getMMSSFromMillis(this.state.soundDuration)}`;
+    }
+    return "";
+  }
+
+  _createNewRecording = () => {
+    this.sound.stopAsync();
+    this.setState({ isPlaying: false });
+    this.sound = null;
+    this.status = null;
   };
 
   render() {
+    const { isRecording } = this.state;
     return (
       <View style={styles.container}>
-        <TouchableOpacity
-          style={styles.recordingBtnContainer}
-          onPress={this._recording}
-        >
-          <Text>Start</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.recordingBtnContainer}
-          onPress={this._stopRecording}
-        >
-          <Text>Stop</Text>
-        </TouchableOpacity>
-        <Text>============</Text>
-        <TouchableOpacity
-          style={styles.recordingBtnContainer}
-          onPress={this._play}
-        >
-          <Text>{this.state.isPlaying ? "Stop" : "Play"}</Text>
-        </TouchableOpacity>
+        {this.sound ? (
+          <View style={styles.playingContainer}>
+            <Icon.Ionicons
+              name={"ios-recording"}
+              size={100}
+              style={{ margin: 5, justifyContent: "center" }}
+            />
+            <Slider
+              style={{ alignSelf: "stretch" }}
+              minimumTrackTintColor="#bbb"
+              maximumTrackTintColor="#910D01"
+              value={this._getSeekSliderPosition()}
+              onValueChange={this._onSliderValueChange}
+              onSlidingComplete={this._onSliderSlidingComplete}
+            />
+            <Text style={styles.timestamp}>{this._getPlaybackTimestamp()}</Text>
+            <View style={styles.playBtnContainer}>
+              <TouchableOpacity style={styles.playBtn} onPress={this._play}>
+                <Text style={{ fontSize: 20 }}>
+                  {this.state.isPlaying ? "Pause" : "Play"}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.playBtn}
+                onPress={this._createNewRecording}
+              >
+                <Text style={{ fontSize: 20 }}>New Recording</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ) : (
+          <View>
+            <TouchableOpacity
+              style={styles.recordingBtnContainer}
+              onPress={this._toggleRecording}
+            >
+              {isRecording ? (
+                <Icon.Foundation
+                  name={"stop"}
+                  size={100}
+                  style={{ margin: 5, justifyContent: "center" }}
+                />
+              ) : (
+                <Icon.Ionicons
+                  name={"ios-recording"}
+                  size={100}
+                  style={{ margin: 5, justifyContent: "center" }}
+                />
+              )}
+            </TouchableOpacity>
+            <Text style={styles.recorderTitle}>Petit Recorder</Text>
+          </View>
+        )}
       </View>
     );
   }
@@ -120,14 +281,51 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
+    backgroundColor: "#fff"
+  },
+  recorderTitle: {
+    fontSize: 25,
+    alignSelf: "center"
   },
   recordingBtnContainer: {
-    padding: 10,
-    backgroundColor: "pink",
-    width: Layout.window.width * 0.2,
+    paddingTop: 10,
+    width: 160,
+    height: 160,
+    margin: 20,
+    borderRadius: 80,
+    borderWidth: 2,
     alignSelf: "center",
     alignItems: "center",
-    margin: 10
+    justifyContent: "center"
+  },
+  playBtnContainer: {
+    marginTop: 20,
+    flexDirection: "column",
+    justifyContent: "space-between",
+    alignSelf: "center",
+    alignItems: "center"
+  },
+  playBtn: {
+    width: Layout.window.width * 0.2,
+    height: 50,
+    margin: 5,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: "#910D01",
+    alignSelf: "center",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  playingContainer: {
+    alignSelf: "center",
+    alignItems: "center",
+    width: Layout.window.width * 0.3,
+    height: Layout.window.height * 0.3,
+    backgroundColor: "white"
+  },
+  timestamp: {
+    fontSize: 20,
+    alignSelf: "center"
   }
 });

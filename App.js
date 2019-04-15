@@ -1,31 +1,52 @@
 import React from "react";
-import {
-  Platform,
-  StatusBar,
-  StyleSheet,
-  View,
-  AsyncStorage
-} from "react-native";
-import { AppLoading, Asset, Font, Icon } from "expo";
+import { StyleSheet, View, AsyncStorage } from "react-native";
 import AppNavigator from "./navigation/AppNavigator";
+import Login from "./components/Login";
 
 export default class App extends React.Component {
   state = {
-    timers: [],
-    isMetronomePlaying: false
+    isLocked: false,
+    timers: []
   };
 
   componentDidMount() {
     this._getTimers();
+    this._getLockScreen();
     // AsyncStorage.clear();
   }
 
-  handleTimerSave = () => {
-    this._getTimers();
+  _getLockScreen = async () => {
+    const password = await AsyncStorage.getItem("password");
+    if (password) {
+      const passwordObj = JSON.parse(password);
+      if (passwordObj.isLocked) this.setState({ isLocked: true });
+    }
   };
 
-  _togglePlaying = () => {
-    this.setState({ isMetronomePlaying: !this.state.isMetronomePlaying });
+  // Login Fn
+  _handleSubmit = async args => {
+    try {
+      const password = await AsyncStorage.getItem("password");
+      const passwordObj = JSON.parse(password);
+      if (
+        passwordObj.password ===
+        `${args.password1}${args.password2}${args.password3}${args.password4}`
+      ) {
+        this.setState({ isLocked: false });
+      } else {
+        alert("Please check your password again.");
+        this.setState({ isLocked: true });
+      }
+    } catch (err) {
+      console.log(err);
+    }
+
+    this.setState({ isLoggedIn: true });
+  };
+
+  // Timer sending Fn
+  handleTimerSave = () => {
+    this._getTimers();
   };
 
   _getTimers = async () => {
@@ -41,18 +62,22 @@ export default class App extends React.Component {
   };
 
   render() {
+    const { timers, isLoggedIn, isLocked } = this.state;
     return (
       <View style={styles.container}>
-        <AppNavigator
-          screenProps={{
-            timers: this.state.timers,
-            togglePlaying: this._togglePlaying,
-            handleTimerSave: this.handleTimerSave,
-            isDataDeleted: this.state.isDataDeleted,
-            toggleDataDelete: this._toggleDataDelete,
-            isMetronomePlaying: this.state.isMetronomePlaying
-          }}
-        />
+        {!isLocked ? (
+          <AppNavigator
+            screenProps={{
+              timers: timers,
+              togglePlaying: this._togglePlaying,
+              handleTimerSave: this.handleTimerSave,
+              isDataDeleted: this.state.isDataDeleted,
+              toggleDataDelete: this._toggleDataDelete
+            }}
+          />
+        ) : (
+          <Login handleSubmit={this._handleSubmit} />
+        )}
       </View>
     );
   }
