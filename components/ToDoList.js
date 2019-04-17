@@ -84,7 +84,7 @@ export default class ToDoList extends React.Component {
 
   _updateToDo = (id, text) => {
     let toDos = this.state.toDos;
-    console.log(toDos);
+    // console.log(toDos);
     let newToDos = toDos.map(toDo => {
       if (toDo.id === id) {
         toDo.content = text;
@@ -140,7 +140,6 @@ export default class ToDoList extends React.Component {
 const styles = StyleSheet.create({
   container: {
     width: Layout.window.width * 0.9,
-    // backgroundColor: "red",
     marginTop: Layout.window.height * 0.05
   },
   inputContainer: {
@@ -151,7 +150,8 @@ const styles = StyleSheet.create({
     padding: 10,
     margin: 5,
     fontSize: 20,
-    fontWeight: "500"
+    fontWeight: "500",
+    fontFamily: "vollkorn-regular"
   },
   toDos: {
     marginTop: 20

@@ -5,7 +5,8 @@ import {
   StyleSheet,
   Switch,
   AsyncStorage,
-  Alert
+  Alert,
+  Linking
 } from "react-native";
 import Layout from "../constants/Layout";
 import PasswordForm from "./PasswordForm";
@@ -14,6 +15,7 @@ export default class PersonalSetting extends React.Component {
   state = {
     isPasswordOn: false,
     isRemoveOn: false,
+    isLinkOn: false,
     isFormOpened: false
   };
 
@@ -47,6 +49,7 @@ export default class PersonalSetting extends React.Component {
     };
     AsyncStorage.setItem("password", JSON.stringify(passwordObj));
     this._toggleForm();
+    this.setState({ isPasswordOn: true });
   };
 
   _toggleForm = () => {
@@ -91,19 +94,39 @@ export default class PersonalSetting extends React.Component {
     );
   };
 
+  _linkToIMSLP = () => {
+    Linking.openURL("https://imslp.org/");
+  };
+
   render() {
-    const { isPasswordOn, isRemoveOn, isFormOpened } = this.state;
+    const { isPasswordOn, isRemoveOn, isLinkOn, isFormOpened } = this.state;
 
     return (
       <View style={styles.container}>
         <Text style={styles.pageTitle}>Personal Setting</Text>
-        <View style={styles.passwordSet}>
-          <Text style={styles.passwordSetTitle}>| Set Password</Text>
-          <Switch onValueChange={this._switchOnChange} value={isPasswordOn} />
+        <View style={styles.optionSet}>
+          <Text style={styles.setTitle}>| Set Password</Text>
+          <Switch
+            onValueChange={this._switchOnChange}
+            value={isPasswordOn}
+            trackColor={{ false: "lightgrey", true: "#910D01" }}
+          />
         </View>
-        <View style={styles.removeSet}>
-          <Text style={styles.removeDataSetTitle}>| Remove All Data</Text>
-          <Switch onValueChange={this._removeAlert} value={isRemoveOn} />
+        <View style={styles.optionSet}>
+          <Text style={styles.setTitle}>| Remove All Data</Text>
+          <Switch
+            onValueChange={this._removeAlert}
+            value={isRemoveOn}
+            trackColor={{ false: "lightgrey", true: "#910D01" }}
+          />
+        </View>
+        <View style={styles.optionSet}>
+          <Text style={styles.setTitle}>| Open IMSLP</Text>
+          <Switch
+            onValueChange={this._linkToIMSLP}
+            value={isLinkOn}
+            trackColor={{ false: "lightgrey", true: "#910D01" }}
+          />
         </View>
 
         {isPasswordOn && isFormOpened ? (
@@ -112,6 +135,9 @@ export default class PersonalSetting extends React.Component {
             toggleForm={this._toggleForm}
           />
         ) : null}
+        <View style={styles.quoteContainer}>
+          <Text style={styles.quote}>"Cantabile"</Text>
+        </View>
       </View>
     );
   }
@@ -120,30 +146,33 @@ export default class PersonalSetting extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    padding: Layout.window.width * 0.05
+    padding: Layout.window.width * 0.07
   },
   pageTitle: {
-    fontSize: 40,
+    fontSize: 35,
     alignSelf: "center",
-    marginBottom: Layout.window.height * 0.03
+    marginBottom: Layout.window.height * 0.03,
+    fontFamily: "vollkorn-bold"
   },
-  passwordSet: {
+  optionSet: {
     width: "100%",
     padding: Layout.window.width * 0.01,
     flexDirection: "row",
     justifyContent: "space-between"
   },
-  removeSet: {
-    width: "100%",
-    padding: Layout.window.width * 0.01,
-    flexDirection: "row",
-    justifyContent: "space-between"
+  setTitle: {
+    fontSize: 25,
+    fontFamily: "vollkorn-regular"
   },
-  passwordSetTitle: {
-    fontSize: 30
+  quoteContainer: {
+    position: "absolute",
+    bottom: 3,
+    margin: 10,
+    alignSelf: "center"
   },
-  removeDataSetTitle: {
-    fontSize: 30
+  quote: {
+    fontSize: 18,
+    color: "grey",
+    fontFamily: "vollkorn-regular"
   }
 });

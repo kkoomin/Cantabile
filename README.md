@@ -1,30 +1,22 @@
 # Cantabile
 
-Cantabile is an iPad app for music students.
+iPad application for music students to read music sheets, manage daily schedules and practice hours
 
 ## Installation
 
-```bash
-npm start
-```
+(not published yet)
 
 ## Feature
 
 1. Calendar
 2. PDF score reader
-   - Metronome
 3. Practice log
    - Timer
    - Daily ToDo List
-
-## User Stories
-
-- Description of what a user should be able to do  
-  Able to login/logout  
-  Able to add and remove musical sheets
-  Able to create and delete schedule on calendar
-  Able to use the metronome whilst reading the score
-  Able to use timer to count daily practice hours
+4. Setting
+   - Metronome
+   - Recorder
+   - Personal setting
 
 ## Project Schedule
 
@@ -32,26 +24,25 @@ npm start
   [v] calendar schedule add form  
   [v] calendar schedule edit / delete  
   [v] score list rendering  
-  [ ] Metronome  
+  [v] Metronome  
   [v] timer  
   [v] daily to do list
+  [v] Recorder
 
 - Final version features
 
-- Stretch goals
-  [ ] multiple timer
-  [ ] page turner button for pdf
-  [ ] metronome visualizer
-  [ ] practice counter coloring game
-
-- Which features you plan on having done on which days
-
-## Wire-Frames
+  - MVP features
+  - Recorder
+  - App lock screen
+  - Clear app data functionality
 
 ## Technologies
 
-- FrontEnd: React Native
-- BackEnd: Ruby on Rails
+- React Native
+- react-native-calendars, rn-pdf-reader-js
+- Expo
 
-- Libraries/gems: react-native-calendars, rn-pdf-reader-js
-- APIs
+## Credits
+
+- Font : Vollkorn (regular, bold)
+- Icon : Expo vector-icons

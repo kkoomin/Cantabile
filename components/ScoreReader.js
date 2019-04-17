@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, StyleSheet, View, Dimensions, WebView } from "react-native";
+import { StyleSheet, View, Dimensions } from "react-native";
 import { KeepAwake } from "expo";
 import PDFReader from "rn-pdf-reader-js";
 

@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   TextInput,
-  ScrollView,
   TouchableOpacity
 } from "react-native";
 import { Icon } from "expo";
@@ -45,6 +44,7 @@ export default class ToDo extends React.Component {
               <View style={[styles.button, styles.completeBtn]}>
                 <Icon.FontAwesome
                   name={isCompleted ? "check-circle-o" : "circle-o"}
+                  color={isCompleted ? "#910D01" : "#000"}
                   size={30}
                 />
               </View>
@@ -74,6 +74,7 @@ export default class ToDo extends React.Component {
                 <Icon.FontAwesome
                   name={isCompleted ? "check-circle-o" : "circle-o"}
                   size={30}
+                  color={isCompleted ? "#910D01" : "#000"}
                 />
               </View>
             </TouchableOpacity>
@@ -112,18 +113,16 @@ export default class ToDo extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    // backgroundColor: "lightblue",
-    // marginTop: 5,
     flexDirection: "row",
     justifyContent: "space-between",
     borderBottomWidth: 2,
     borderColor: "lightgrey"
-    // width: Layout.window.width * 0.8
   },
   text: {
     padding: 5,
     margin: 5,
-    fontSize: 18
+    fontSize: 20,
+    fontFamily: "vollkorn-regular"
   },
   todoText: {
     width: Layout.window.width * 0.7
@@ -138,6 +137,7 @@ const styles = StyleSheet.create({
     margin: 5
   },
   completedText: {
-    textDecorationLine: "line-through"
+    textDecorationLine: "line-through",
+    color: "#910D01"
   }
 });

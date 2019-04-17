@@ -48,7 +48,8 @@ const styles = StyleSheet.create({
   text: {
     padding: 5,
     margin: 5,
-    fontSize: 18
+    fontSize: 20,
+    fontFamily: "vollkorn-regular"
   },
   score: {
     flexDirection: "row",
@@ -59,12 +60,10 @@ const styles = StyleSheet.create({
   },
   titleText: {
     width: Layout.window.width * 0.6,
-    // backgroundColor: "blue",
     marginBottom: 0
   },
   commentText: {
-    // backgroundColor: "red",
-    fontSize: 13,
+    fontSize: 15,
     color: "grey",
     marginTop: 0
   },

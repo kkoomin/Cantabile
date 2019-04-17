@@ -62,7 +62,8 @@ export default class Metronome extends Component {
       <View style={styles.container}>
         <Icon.MaterialCommunityIcons
           name={"metronome"}
-          size={100}
+          size={130}
+          color={"#000"}
           style={{ margin: 5 }}
         />
         <TouchableOpacity style={styles.button} onPress={this._playAndPause}>
@@ -78,9 +79,7 @@ export default class Metronome extends Component {
           onValueChange={this._handleBpmChange}
           step="5"
         />
-        <Text style={{ fontSize: 20, color: "white" }}>
-          {this.state.bpm} bpm
-        </Text>
+        <Text style={styles.bpmText}>{this.state.bpm} bpm</Text>
       </View>
     );
   }
@@ -96,7 +95,7 @@ const styles = StyleSheet.create({
   },
   button: {
     width: 200,
-    height: 50,
+    height: 45,
     margin: 5,
     borderRadius: 10,
     backgroundColor: "#fff",
@@ -105,6 +104,13 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 20,
     textAlign: "center",
-    backgroundColor: "transparent"
+    backgroundColor: "white",
+    fontFamily: "vollkorn-regular"
+  },
+  bpmText: {
+    fontSize: 20,
+    color: "white",
+    fontWeight: "500",
+    fontFamily: "vollkorn-regular"
   }
 });

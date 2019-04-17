@@ -193,6 +193,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     alignSelf: "center",
-    fontSize: 20
+    fontSize: 20,
+    fontFamily: "vollkorn-regular"
   }
 });

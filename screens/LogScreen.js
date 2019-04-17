@@ -2,7 +2,6 @@ import React from "react";
 import {
   View,
   StyleSheet,
-  TouchableOpacity,
   Text,
   TouchableWithoutFeedback,
   Keyboard
@@ -36,7 +35,7 @@ export default class ChatScreen extends React.Component {
           />
           <ToDoList />
           <View style={styles.quoteContainer}>
-            <Text style={styles.quote}>"Practice makes Perfect"</Text>
+            <Text style={styles.quote}>"Practice makes perfect"</Text>
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -55,16 +54,19 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   logTitle: {
-    fontSize: 25,
-    margin: 20
+    fontSize: 35,
+    margin: 20,
+    fontFamily: "vollkorn-bold"
   },
   quoteContainer: {
     position: "absolute",
     bottom: 3,
-    margin: 10
+    margin: 10,
+    alignSelf: "center"
   },
   quote: {
     fontSize: 18,
-    color: "grey"
+    color: "grey",
+    fontFamily: "vollkorn-regular"
   }
 });

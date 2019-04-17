@@ -7,8 +7,6 @@ import {
   View,
   AsyncStorage
 } from "react-native";
-import { Font } from "expo";
-import { Calendar } from "react-native-calendars";
 import Schedule from "../components/Schedule";
 import ScheduleForm from "../components/ScheduleForm";
 import ScheduleDetail from "../components/ScheduleDetail";
@@ -26,7 +24,7 @@ export default class CalendarScreen extends React.Component {
   };
 
   state = {
-    selectedDateObj: null, // Line 149 format
+    selectedDateObj: null, // Line 167 format
     selectedDateString: undefined, // ex) "2019-04-01"
 
     formOpened: false,
@@ -42,13 +40,8 @@ export default class CalendarScreen extends React.Component {
   };
 
   componentDidMount() {
-    //font 받으려면 async 앞에 붙여야함
     let current_datetime = new Date();
 
-    // await Font.loadAsync({
-    //   "space-mono": require("../assets/fonts/SpaceMono-Regular.ttf")
-    // });
-    // AsyncStorage.clear();
     this._getSchedules().then(() => {
       this.setState({
         fontLoaded: true,
@@ -100,10 +93,12 @@ export default class CalendarScreen extends React.Component {
     });
   };
 
-  _updateSchedule = (id, content, memo) => {
+  _updateSchedule = (id, pickedDate, pickedTime, content, memo) => {
     let schedules = this.state.schedules;
     updatedSchedules = schedules.map(schedule => {
       if (schedule.id === id) {
+        schedule.date = pickedDate;
+        schedule.time = pickedTime;
         schedule.content = content;
         schedule.memo = memo;
       }
@@ -139,6 +134,13 @@ export default class CalendarScreen extends React.Component {
           schedules: parsedSchedules || []
         },
         () => {
+          if (this.state.selectedSchedule) {
+            this.setState({
+              selectedSchedule: this.state.schedules.find(
+                s => s.id === this.state.selectedSchedule.id
+              )
+            });
+          }
           let markedDates = {};
           this.state.schedules.map(schedule => {
             markedDates[schedule.date] = {
@@ -167,25 +169,20 @@ export default class CalendarScreen extends React.Component {
 
   // Calendar Function
   _onDayPress = day => {
-    this.setState(
-      {
-        selectedDateObj: {
-          [day.dateString]: {
-            selected: true,
-            selectedColor: "#B83925",
-            marked: Object.keys(this.state.markedDates).includes(day.dateString)
-              ? true
-              : false,
-            dotColor: "white",
-            date: day.dateString
-          }
-        },
-        selectedDateString: day.dateString
+    this.setState({
+      selectedDateObj: {
+        [day.dateString]: {
+          selected: true,
+          selectedColor: "#B83925",
+          marked: Object.keys(this.state.markedDates).includes(day.dateString)
+            ? true
+            : false,
+          dotColor: "white",
+          date: day.dateString
+        }
       },
-      () => {
-        console.log(this.state.selectedDateObj);
-      }
-    );
+      selectedDateString: day.dateString
+    });
   };
 
   _onMonthChange = () => {
@@ -284,21 +281,14 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center"
   },
-  calendar: {
-    width: Layout.window.width - 180,
-    marginTop: Layout.window.height * 0.04,
-    marginBottom: 20
-  },
   daySchedule: {
     flex: 1,
-    width: Layout.window.width - 150,
-    // borderWidth: 1,
-    paddingTop: 20
+    width: Layout.window.width - 150
   },
   scheduleCreateBtn: {
     borderWidth: 1,
     borderRadius: 4,
-    borderColor: "lightgrey",
+    borderColor: "grey",
     padding: 10,
     width: 250,
     alignItems: "center",
@@ -307,6 +297,7 @@ const styles = StyleSheet.create({
   },
   scheduleCreateBtnText: {
     fontSize: 20,
-    color: "#910D01"
+    color: "#910D01",
+    fontFamily: "vollkorn-regular"
   }
 });

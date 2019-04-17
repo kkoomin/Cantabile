@@ -21,19 +21,18 @@ export default class Recorder extends React.Component {
     shouldPlay: false
   };
 
-  componentDidMount() {
+  async componentDidMount() {
     this._getRecordingPermissions();
   }
-
   async _getRecordingPermissions() {
     let permissionStatus = await Permissions.askAsync(
       Permissions.AUDIO_RECORDING
     );
     if (permissionStatus.status === "granted") {
-      console.log("granted", permissionStatus);
+      // console.log("granted", permissionStatus);
       this.setState({ isPermitted: true });
     } else {
-      console.log("error", permissionStatus);
+      alert("Enable microphone access to use recorder.");
     }
   }
 
@@ -89,7 +88,6 @@ export default class Recorder extends React.Component {
         },
         this._updateScreenForSoundStatus
       );
-      // console.log("SOUND AND STATUS", sound, status);
       this.sound = sound;
       this.status = status;
 
@@ -102,8 +100,6 @@ export default class Recorder extends React.Component {
         playThroughEarpieceAndroid: false
       });
       this.setState({ isRecording: false });
-      // console.log("stop recording");
-      // console.log(this.status.durationMillis); // recorded file seconds
     } catch (error) {
       console.log(error);
     }
@@ -124,10 +120,10 @@ export default class Recorder extends React.Component {
   };
 
   _updateScreenForSoundStatus = status => {
-    console.log("UPDATING SCREEN FOR SOUND STATUS", status);
+    // console.log("UPDATING SCREEN FOR SOUND STATUS", status);
     if (status.isLoaded) {
       this.setState({
-        soundDuration: status.durationMillis,
+        soundDuration: status.durationMillis, // recorded file seconds
         soundPosition: status.positionMillis,
         shouldPlay: status.shouldPlay,
         isPlaying: status.isPlaying,
@@ -144,16 +140,16 @@ export default class Recorder extends React.Component {
         isPlaybackAllowed: false
       });
       if (status.error) {
-        Alert(`FATAL PLAYER ERROR: ${status.error}`);
+        Alert(status.error);
       }
     }
   };
 
   _onSliderValueChange = value => {
-    console.log("SEEK SLIDER VALUE", value);
+    // console.log("SEEK SLIDER VALUE", value);
     if (this.sound != null && !this.isSeeking) {
       this.isSeeking = true;
-      this.shouldPlayAtEndOfSeek = this.state.shouldPlay;
+      this.playThisPosition = this.state.shouldPlay;
       this.sound.pauseAsync();
     }
   };
@@ -161,16 +157,16 @@ export default class Recorder extends React.Component {
   _onSliderSlidingComplete = async value => {
     if (this.sound != null) {
       this.isSeeking = false;
-      const seekPosition = value * this.state.soundDuration;
-      if (this.shouldPlayAtEndOfSeek) {
-        this.sound.playFromPositionAsync(seekPosition);
+      const foundPosition = value * this.state.soundDuration;
+      if (this.playThisPosition) {
+        this.sound.playFromPositionAsync(foundPosition);
       } else {
-        this.sound.setPositionAsync(seekPosition);
+        this.sound.setPositionAsync(foundPosition);
       }
     }
   };
 
-  _getSeekSliderPosition() {
+  _getSliderPosition() {
     if (
       this.sound != null &&
       this.state.soundPosition != null &&
@@ -180,19 +176,20 @@ export default class Recorder extends React.Component {
     }
     return 0;
   }
-  _getMMSSFromMillis(millis) {
-    const totalSeconds = millis / 1000;
+
+  _formatDuration(ms) {
+    const totalSeconds = ms / 1000;
     const seconds = Math.floor(totalSeconds % 60);
     const minutes = Math.floor(totalSeconds / 60);
 
-    const padWithZero = number => {
-      const string = number.toString();
-      if (number < 10) {
-        return "0" + string;
+    const formattedNum = num => {
+      const string = num.toString();
+      if (num < 10) {
+        return `0${string}`;
       }
       return string;
     };
-    return padWithZero(minutes) + ":" + padWithZero(seconds);
+    return `${formattedNum(minutes)}:${formattedNum(seconds)}`;
   }
 
   _getPlaybackTimestamp() {
@@ -201,9 +198,9 @@ export default class Recorder extends React.Component {
       this.state.soundPosition != null &&
       this.state.soundDuration != null
     ) {
-      return `${this._getMMSSFromMillis(
+      return `${this._formatDuration(
         this.state.soundPosition
-      )} / ${this._getMMSSFromMillis(this.state.soundDuration)}`;
+      )} / ${this._formatDuration(this.state.soundDuration)}`;
     }
     return "";
   }
@@ -230,14 +227,14 @@ export default class Recorder extends React.Component {
               style={{ alignSelf: "stretch" }}
               minimumTrackTintColor="#bbb"
               maximumTrackTintColor="#910D01"
-              value={this._getSeekSliderPosition()}
+              value={this._getSliderPosition()}
               onValueChange={this._onSliderValueChange}
               onSlidingComplete={this._onSliderSlidingComplete}
             />
             <Text style={styles.timestamp}>{this._getPlaybackTimestamp()}</Text>
             <View style={styles.playBtnContainer}>
               <TouchableOpacity style={styles.playBtn} onPress={this._play}>
-                <Text style={{ fontSize: 20 }}>
+                <Text style={styles.playBtnText}>
                   {this.state.isPlaying ? "Pause" : "Play"}
                 </Text>
               </TouchableOpacity>
@@ -245,7 +242,7 @@ export default class Recorder extends React.Component {
                 style={styles.playBtn}
                 onPress={this._createNewRecording}
               >
-                <Text style={{ fontSize: 20 }}>New Recording</Text>
+                <Text style={styles.playBtnText}>New Recording</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -258,12 +255,14 @@ export default class Recorder extends React.Component {
               {isRecording ? (
                 <Icon.Foundation
                   name={"stop"}
+                  color={"#910D01"}
                   size={100}
                   style={{ margin: 5, justifyContent: "center" }}
                 />
               ) : (
                 <Icon.Ionicons
                   name={"ios-recording"}
+                  color={"#910D01"}
                   size={100}
                   style={{ margin: 5, justifyContent: "center" }}
                 />
@@ -286,13 +285,15 @@ const styles = StyleSheet.create({
   },
   recorderTitle: {
     fontSize: 25,
-    alignSelf: "center"
+    alignSelf: "center",
+    fontFamily: "vollkorn-bold"
   },
   recordingBtnContainer: {
     paddingTop: 10,
     width: 160,
     height: 160,
     margin: 20,
+    borderColor: "lightgrey",
     borderRadius: 80,
     borderWidth: 2,
     alignSelf: "center",
@@ -312,10 +313,15 @@ const styles = StyleSheet.create({
     margin: 5,
     borderRadius: 15,
     borderWidth: 1,
-    borderColor: "#910D01",
+    borderColor: "grey",
     alignSelf: "center",
     alignItems: "center",
     justifyContent: "center"
+  },
+  playBtnText: {
+    fontSize: 20,
+    color: "#000",
+    fontFamily: "vollkorn-regular"
   },
   playingContainer: {
     alignSelf: "center",
@@ -326,6 +332,7 @@ const styles = StyleSheet.create({
   },
   timestamp: {
     fontSize: 20,
-    alignSelf: "center"
+    alignSelf: "center",
+    fontFamily: "vollkorn-regular"
   }
 });

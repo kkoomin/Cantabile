@@ -91,7 +91,7 @@ export default class PasswordForm extends Component {
               style={styles.closeBtnContainer}
               onPress={() => toggleForm()}
             >
-              <Icon.Ionicons name={"ios-close-circle-outline"} size={40} />
+              <Icon.Ionicons name={"md-close"} size={40} />
             </TouchableOpacity>
           </View>
         </View>
@@ -108,7 +108,6 @@ const styles = StyleSheet.create({
   passwordContainer: {
     width: Layout.window.width * 0.6,
     height: Layout.window.height * 0.4,
-    borderColor: "#910D01",
     borderWidth: 1,
     borderRadius: 40,
     padding: Layout.window.height * 0.05,
@@ -122,7 +121,8 @@ const styles = StyleSheet.create({
   passwordTitle: {
     fontSize: 25,
     alignSelf: "center",
-    marginBottom: Layout.window.height * 0.05
+    marginBottom: Layout.window.height * 0.05,
+    fontFamily: "vollkorn-regular"
   },
   inputFields: {
     flexDirection: "row",

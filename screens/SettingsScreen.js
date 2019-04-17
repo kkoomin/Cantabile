@@ -56,7 +56,8 @@ export default class SettingsScreen extends React.Component {
               style={[
                 styles.btnDiv,
                 {
-                  borderRightWidth: isRecorderOpen ? 0 : 1
+                  borderRightWidth: isRecorderOpen ? 0 : 1,
+                  borderColor: "grey"
                   // backgroundColor: isRecorderOpen ? "#910D01" : "white"
                 }
               ]}
@@ -67,7 +68,7 @@ export default class SettingsScreen extends React.Component {
               >
                 <Icon.MaterialCommunityIcons
                   name={"record-rec"}
-                  size={80}
+                  size={75}
                   style={{
                     alignSelf: "center",
                     padding: 0,
@@ -80,7 +81,9 @@ export default class SettingsScreen extends React.Component {
               style={[
                 styles.btnDiv,
                 {
-                  borderRightWidth: isSettingOpen ? 0 : 1
+                  borderRightWidth: isSettingOpen ? 0 : 1,
+                  borderTopWidth: 1,
+                  borderColor: "grey"
                   // backgroundColor: isSettingOpen ? "#910D01" : "white"
                 }
               ]}
@@ -91,7 +94,7 @@ export default class SettingsScreen extends React.Component {
               >
                 <Icon.MaterialCommunityIcons
                   name={"settings-outline"}
-                  size={80}
+                  size={75}
                   style={{
                     alignSelf: "center",
                     padding: 0,
@@ -116,13 +119,14 @@ const styles = StyleSheet.create({
     flex: 1
   },
   metronomeContainer: {
-    height: Layout.window.height * 0.3,
+    height: Layout.window.height * 0.35,
     width: Layout.window.width,
-    // backgroundColor: "grey",
     alignItems: "center",
     justifyContent: "center"
   },
   mainContainer: {
+    borderColor: "grey",
+    borderTopWidth: 1,
     flex: 1,
     flexDirection: "row"
   },
@@ -135,17 +139,13 @@ const styles = StyleSheet.create({
   btnDiv: {
     height: "50%",
     alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "grey"
+    justifyContent: "center"
   },
   button: {
     height: 100,
     width: 100
-    // backgroundColor: "pink"
   },
   componentContainer: {
     width: Layout.window.width * 0.85
-    // backgroundColor: "purple"
   }
 });

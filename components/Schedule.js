@@ -1,14 +1,7 @@
 import React from "react";
-import {
-  Dimensions,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { Icon } from "expo";
-
-const { width, height } = Dimensions.get("window");
+import Layout from "../constants/Layout";
 
 // props: data(id, date, time, content, memo, starred)
 export default class Schedule extends React.Component {
@@ -17,7 +10,7 @@ export default class Schedule extends React.Component {
       <Icon.AntDesign
         name={"star"}
         size={20}
-        style={{ color: "red" }}
+        style={{ color: "#910D01" }}
         onPress={this._toggleStarred}
       />
     );
@@ -31,7 +24,6 @@ export default class Schedule extends React.Component {
       />
     );
     const { data, toggleScheduleDetail } = this.props;
-
     return (
       <View style={styles.scheduleContainer}>
         {data ? (
@@ -69,25 +61,23 @@ const styles = StyleSheet.create({
   scheduleText: {
     padding: 5,
     margin: 10,
-    fontSize: 18
+    fontSize: 20,
+    fontFamily: "vollkorn-regular"
   },
   starred: {
     marginLeft: 10,
     marginRight: 10
-    // borderWidth: 1
   },
   content: {
-    width: width * 0.5
-    // borderWidth: 1
+    width: Layout.window.width * 0.5
   },
   time: {
     marginRight: 20,
-    width: width * 0.1
-    // borderWidth: 1
+    width: Layout.window.width * 0.1
   },
   detailBtn: {
     marginRight: 15,
-    fontSize: 25
-    // borderWidth: 1
+    fontSize: 25,
+    fontFamily: "vollkorn-regular"
   }
 });

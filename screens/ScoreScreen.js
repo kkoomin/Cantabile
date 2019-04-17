@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  Button,
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  Keyboard
-} from "react-native";
+import { Text, StyleSheet, View, TouchableOpacity } from "react-native";
 import { Icon } from "expo";
 import ScoreList from "../components/ScoreList";
 import ScoreReader from "../components/ScoreReader";
@@ -73,6 +66,13 @@ export default class ScoreScreen extends React.Component {
             openFile={this._openFile}
           />
         )}
+        <View style={styles.quoteContainer}>
+          {scoreSelected ? null : (
+            <Text style={styles.quote}>
+              “Without music, life would be a mistake.”
+            </Text>
+          )}
+        </View>
       </View>
     );
   }
@@ -81,5 +81,16 @@ export default class ScoreScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1
+  },
+  quoteContainer: {
+    position: "absolute",
+    bottom: 3,
+    margin: 10,
+    alignSelf: "center"
+  },
+  quote: {
+    fontSize: 18,
+    color: "grey",
+    fontFamily: "vollkorn-regular"
   }
 });

@@ -26,6 +26,7 @@ const styles = StyleSheet.create({
   practiceHoursTitle: {
     fontWeight: "600",
     fontSize: 25,
-    color: "grey"
+    color: "grey",
+    fontFamily: "vollkorn-bold"
   }
 });

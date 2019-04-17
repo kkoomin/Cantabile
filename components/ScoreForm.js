@@ -4,12 +4,9 @@ import {
   Modal,
   ScrollView,
   View,
-  Button,
   TextInput,
   StyleSheet,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  Keyboard
+  TouchableOpacity
 } from "react-native";
 import Layout from "../constants/Layout";
 import { Icon } from "expo";
@@ -32,7 +29,6 @@ export default class ScoreForm extends Component {
     return (
       <Modal
         style={{ padding: 100 }}
-        // transparent={true}
         animationType="slide"
         onRequestClose={toggleForm}
       >
@@ -64,7 +60,13 @@ export default class ScoreForm extends Component {
             onChangeText={text => changeComment(text)}
           />
           <TouchableOpacity style={styles.chooseFileBtn} onPress={chooseFile}>
-            <Text style={{ fontSize: 18, alignSelf: "center" }}>
+            <Text
+              style={{
+                fontSize: 18,
+                alignSelf: "center",
+                fontFamily: "vollkorn-regular"
+              }}
+            >
               {isFileUploaded ? "File Uploaded" : "Select Score"}
             </Text>
             <Icon.Ionicons
@@ -86,7 +88,7 @@ export default class ScoreForm extends Component {
             style={styles.closeBtnContainer}
             onPress={toggleForm}
           >
-            <Icon.Ionicons name={"ios-close-circle-outline"} size={40} />
+            <Icon.Ionicons name={"md-close"} size={40} />
           </TouchableOpacity>
         </View>
       </Modal>
@@ -115,28 +117,31 @@ const styles = StyleSheet.create({
   formTitle: {
     fontSize: 30,
     alignSelf: "center",
-    marginBottom: 10 // 50
+    marginBottom: 10,
+    fontFamily: "vollkorn-regular"
   },
   formInput: {
     margin: 10,
     padding: 10,
-    borderBottomColor: "grey",
+    borderBottomColor: "#bbb",
     borderBottomWidth: 2,
-    fontSize: 20
+    fontSize: 20,
+    fontFamily: "vollkorn-regular"
   },
   selectScoreConfirm: {
     borderWidth: 1,
     borderRadius: 4,
     borderColor: "black",
     padding: 10,
-    width: 100,
+    width: 120,
     alignItems: "center",
     marginTop: 20,
     alignSelf: "center"
   },
   selectScoreConfirmBtn: {
     fontSize: 18,
-    color: "#910D01"
+    color: "#910D01",
+    fontFamily: "vollkorn-bold"
   },
   closeBtnContainer: {
     position: "absolute",
@@ -144,7 +149,6 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     alignItems: "center",
     width: 50
-    // backgroundColor: "red"
   },
   chooseFileBtn: {
     padding: 5,

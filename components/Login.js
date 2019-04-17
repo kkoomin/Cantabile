@@ -6,7 +6,6 @@ import {
   StyleSheet,
   ImageBackground
 } from "react-native";
-import { Icon } from "expo";
 import Layout from "../constants/Layout";
 
 export default class Login extends React.Component {
@@ -23,12 +22,13 @@ export default class Login extends React.Component {
     return (
       <View style={styles.container}>
         <ImageBackground
-          source={require("../assets/music_paper.png")}
+          source={require("../assets/images/music_paper.png")}
           style={styles.imageBackground}
           imageStyle={{ resizeMode: "contain" }}
         >
           <View style={styles.passwordContainer}>
             <TextInput
+              style={styles.passwordInput}
               ref={input => {
                 this.field_1 = input;
               }}
@@ -42,6 +42,7 @@ export default class Login extends React.Component {
               }}
             />
             <TextInput
+              style={styles.passwordInput}
               ref={input => {
                 this.field_2 = input;
               }}
@@ -54,6 +55,7 @@ export default class Login extends React.Component {
               }}
             />
             <TextInput
+              style={styles.passwordInput}
               ref={input => {
                 this.field_3 = input;
               }}
@@ -66,6 +68,7 @@ export default class Login extends React.Component {
               }}
             />
             <TextInput
+              style={styles.passwordInput}
               ref={input => {
                 this.field_4 = input;
               }}
@@ -73,9 +76,16 @@ export default class Login extends React.Component {
               value={password4 ? "🎵" : null}
               keyboardType={"numeric"}
               onChangeText={text => {
-                this.setState({ password4: text }, () =>
-                  handleSubmit({ ...this.state })
-                );
+                this.setState({ password4: text }, () => {
+                  handleSubmit({ ...this.state });
+                  this.setState({
+                    password1: null,
+                    password2: null,
+                    password3: null,
+                    password4: null
+                  });
+                  this.field_1.focus();
+                });
               }}
             />
           </View>
@@ -98,10 +108,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     width: Layout.window.width * 0.5,
     height: 150,
-    // backgroundColor: "pink",
     alignSelf: "center",
     position: "absolute",
     top: Layout.window.height * 0.1
+  },
+  passwordInput: {
+    fontSize: 24
   },
   imageBackground: {
     width: Layout.window.width,
@@ -112,7 +124,7 @@ const styles = StyleSheet.create({
   },
   introText: {
     alignSelf: "center",
-    fontSize: 25,
+    fontSize: 20,
     color: "grey",
     position: "absolute",
     top: Layout.window.height * 0.25

@@ -3,7 +3,6 @@ import {
   Modal,
   View,
   Text,
-  TextInput,
   Button,
   StyleSheet,
   TouchableOpacity
@@ -11,6 +10,7 @@ import {
 import Layout from "../constants/Layout";
 import DateFormat from "../constants/DateFormat";
 import { Icon } from "expo";
+import ScheduleForm from "./ScheduleForm";
 
 // props: data(id, date, time, content, memo, starred)
 export default class ScheduleDetail extends Component {
@@ -42,6 +42,10 @@ export default class ScheduleDetail extends Component {
     this.setState({ memo: text });
   };
 
+  _toggleScheduleForm = () => {
+    this.setState({ isEditing: false });
+  };
+
   render() {
     const {
       toggleScheduleDetail,
@@ -49,30 +53,21 @@ export default class ScheduleDetail extends Component {
       deleteSchedule,
       data
     } = this.props;
-    const { isEditing, content, memo } = this.state;
+    const { isEditing } = this.state;
     const star = (
-      <Icon.AntDesign
-        name={"star"}
-        size={25}
-        style={{ color: "red" }}
-        onPress={this._toggleStarred}
-      />
+      <Icon.AntDesign name={"star"} size={25} style={{ color: "#910D01" }} />
     );
 
     const unstar = (
-      <Icon.AntDesign
-        name={"staro"}
-        size={25}
-        style={{ color: "grey" }}
-        onPress={this._toggleStarred}
-      />
+      <Icon.AntDesign name={"staro"} size={25} style={{ color: "grey" }} />
     );
+    // console.log(data.starred);
     return (
       <Modal style={{ padding: 100 }} transparent={true} animationType="slide">
         <View style={styles.innerContainer}>
           <View style={styles.mainDateContainer}>
             <Text style={styles.mainDate}>
-              {DateFormat.stringDate(new Date(data.date))}
+              {DateFormat.stringDate(new Date(data.date))} | {data.time}
             </Text>
             <TouchableOpacity
               style={styles.starred}
@@ -83,26 +78,11 @@ export default class ScheduleDetail extends Component {
           </View>
           <View style={styles.contentContainer}>
             {isEditing ? (
-              <>
-                <TextInput
-                  style={styles.content}
-                  returnKeyType={"done"}
-                  placeholder="Schedule Name"
-                  placeholderTextColor={"#999"}
-                  autoFocus={true}
-                  value={content}
-                  onChangeText={this._changeContent}
-                />
-                <TextInput
-                  style={styles.memo}
-                  multiline={true}
-                  returnKeyType={"done"}
-                  placeholder="Additional Note"
-                  placeholderTextColor={"#999"}
-                  value={memo}
-                  onChangeText={this._changeMemo}
-                />
-              </>
+              <ScheduleForm
+                toggleScheduleForm={this._toggleScheduleForm}
+                updateSchedule={this.props.updateSchedule}
+                data={this.props.data}
+              />
             ) : (
               <>
                 <Text style={styles.content}>{data.content}</Text>
@@ -114,18 +94,19 @@ export default class ScheduleDetail extends Component {
             <TouchableOpacity
               onPress={isEditing ? this._updateComplete : this._toggleEdit}
             >
-              <Text style={[styles.button, styles.editBtn]}>
-                {isEditing ? "Save" : "Edit"}
-              </Text>
+              <Text style={[styles.button, styles.editBtn]}>Edit</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => deleteSchedule(data.id)}>
               <Text style={[styles.button, styles.deleteBtn]}>Delete</Text>
             </TouchableOpacity>
           </View>
-          <View style={styles.closeBtnContainer}>
-            <Button onPress={() => toggleScheduleDetail()} title="Close" />
-          </View>
         </View>
+        <TouchableOpacity
+          style={styles.closeBtnContainer}
+          onPress={toggleScheduleDetail}
+        >
+          <Icon.Ionicons name={"md-close"} size={40} />
+        </TouchableOpacity>
       </Modal>
     );
   }
@@ -145,8 +126,10 @@ const styles = StyleSheet.create({
   },
   closeBtnContainer: {
     position: "absolute",
-    bottom: 20,
-    alignSelf: "center"
+    bottom: Layout.window.height * 0.15,
+    alignSelf: "center",
+    alignItems: "center",
+    width: 50
   },
   buttonContainer: {
     flexDirection: "row",
@@ -157,7 +140,8 @@ const styles = StyleSheet.create({
   button: {
     padding: 10,
     fontSize: 16,
-    width: 70
+    width: 70,
+    fontFamily: "vollkorn-regular"
   },
   mainDateContainer: {
     borderBottomWidth: 2,
@@ -169,10 +153,10 @@ const styles = StyleSheet.create({
   },
   mainDate: {
     marginLeft: 10,
-    fontSize: 25
+    fontSize: 25,
+    fontFamily: "vollkorn-regular"
   },
   starred: {
-    // backgroundColor: "red",
     alignItems: "center",
     width: 50,
     marginLeft: 5,
@@ -185,17 +169,18 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     paddingLeft: 10,
     paddingRight: 10,
-    // backgroundColor: "red",
     borderBottomWidth: 2,
     borderColor: "lightgrey"
   },
   content: {
-    fontSize: 20
+    fontSize: 20,
+    fontFamily: "vollkorn-regular"
   },
   memo: {
     marginTop: 10,
     marginLeft: 10,
     fontSize: 18,
+    fontFamily: "vollkorn-regular",
     color: "#584d4d"
   }
 });

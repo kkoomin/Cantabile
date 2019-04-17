@@ -103,9 +103,10 @@ export default class ScoreList extends React.Component {
         fileUri: this.state.fileUri
       };
 
-      let newScores = this.state.scores.concat(newScore);
+      let newScores = [newScore].concat(this.state.scores);
       this.setState(
         {
+          newId: uuidv1(),
           scores: newScores,
           formOpened: false,
           composer: "",
@@ -147,7 +148,10 @@ export default class ScoreList extends React.Component {
         <View style={styles.title}>
           <Text style={styles.titleText}>Score</Text>
           <TouchableOpacity style={styles.addButton} onPress={this._toggleForm}>
-            <Icon.MaterialCommunityIcons name={"plus-outline"} size={40} />
+            <Icon.MaterialCommunityIcons
+              name={"plus-circle-outline"}
+              size={40}
+            />
           </TouchableOpacity>
         </View>
 
@@ -183,20 +187,18 @@ export default class ScoreList extends React.Component {
 
 const styles = StyleSheet.create({
   title: {
-    // width: Layout.window.width * 0.2,
     height: Layout.window.height * 0.1,
-
     marginTop: 30,
     marginLeft: Layout.window.width * 0.05,
     marginRight: Layout.window.width * 0.05,
-    justifyContent: "center", //vertically centered
+    justifyContent: "center",
     flexDirection: "row",
     justifyContent: "space-between"
   },
   titleText: {
     width: Layout.window.width * 0.2,
     fontSize: 40,
-    // backgroundColor: "blue",
+    fontFamily: "vollkorn-bold",
     padding: 10,
     margin: 5,
     justifyContent: "center",
@@ -205,8 +207,8 @@ const styles = StyleSheet.create({
   addButton: {
     justifyContent: "center",
     alignSelf: "flex-end",
-    marginRight: 5
-    // backgroundColor: "red"
+    marginRight: 5,
+    marginBottom: 5
   },
   scoreList: {
     marginTop: 10,

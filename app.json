@@ -19,7 +19,11 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "usesIcloudStorage": true
+      "usesIcloudStorage": true,
+      "bundleIdentifier": "Cantabile"
+    },
+    "android": {
+      "package": "Cantabile"
     }
   }
 }

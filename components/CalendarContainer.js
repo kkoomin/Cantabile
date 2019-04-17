@@ -1,19 +1,9 @@
 import React from "react";
-import {
-  TouchableOpacity,
-  StyleSheet,
-  Text,
-  ScrollView,
-  View,
-  AsyncStorage
-} from "react-native";
+import { StyleSheet } from "react-native";
 import Layout from "../constants/Layout";
-
 import { Calendar } from "react-native-calendars";
 
 export default class CalendarContainer extends React.Component {
-  state = {};
-
   render() {
     const {
       onDayPress,
@@ -26,7 +16,6 @@ export default class CalendarContainer extends React.Component {
         onDayPress={day => onDayPress(day)}
         markedDates={{ ...markedDates, ...selectedDateObj }}
         onMonthChange={() => onMonthChange()}
-        monthFormat={"yyyy / MM"}
         hideExtraDays={true}
         disableMonthChange={true}
         firstDay={0} // week starts from Sunday.
@@ -43,7 +32,8 @@ export default class CalendarContainer extends React.Component {
             selected: {
               backgroundColor: "#910D01",
               borderRadius: 20,
-              height: Layout.window.height * 0.03
+              width: 40,
+              height: 40
             },
             dot: {
               width: 6,
@@ -65,6 +55,9 @@ export default class CalendarContainer extends React.Component {
           selectedDotColor: "#ffffff",
           arrowColor: "black",
           monthTextColor: "#910D01",
+          // textDayFontFamily: "vollkorn-regular",
+          textMonthFontFamily: "vollkorn-bold",
+          textDayHeaderFontFamily: "vollkorn-regular",
           textMonthFontWeight: "normal",
           textDayFontSize: 20,
           textMonthFontSize: 25,
@@ -78,7 +71,7 @@ export default class CalendarContainer extends React.Component {
 const styles = StyleSheet.create({
   calendar: {
     width: Layout.window.width - 180,
-    marginTop: Layout.window.height * 0.04,
+    marginTop: Layout.window.height * 0.02,
     marginBottom: 20
   }
 });
