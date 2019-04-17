@@ -24,17 +24,17 @@ iPad application for music students to read music sheets, manage daily schedules
 
 ## Project Schedule
 
-- MVP features  
-  [v] calendar schedule add form  
-  [v] calendar schedule edit / delete  
-  [v] score list rendering  
-  [v] Metronome  
-  [v] timer  
-  [v] daily to do list
-  [v] Recorder
+- MVP features
+
+  - calendar schedule add form
+  - calendar schedule edit / delete
+  - score list rendering
+  - Metronome
+  - timer
+  - daily to do list
+  - Recorder
 
 - Final version features
-
   - MVP features
   - Recorder
   - App lock screen
