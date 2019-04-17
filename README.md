@@ -2,9 +2,13 @@
 
 iPad application for music students to read music sheets, manage daily schedules and practice hours
 
-## Installation
+## Demo
 
-(not published yet)
+![Practice Log](practice_log.gif)
+![Score](score.gif)
+![Schedule](schedule.gif)
+![Setting](setting_1.gif)
+![Setting_password](setting_2.gif)
 
 ## Feature
 
