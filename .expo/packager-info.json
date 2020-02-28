@@ -1,9 +1,10 @@
 {
   "devToolsPort": 19002,
-  "expoServerPort": 19000,
-  "packagerPort": 19001,
-  "packagerPid": 85582,
-  "expoServerNgrokUrl": "https://i5-z67.minha.cantabile.exp.direct",
-  "packagerNgrokUrl": "https://packager.i5-z67.minha.cantabile.exp.direct",
-  "ngrokPid": 85605
+  "expoServerPort": null,
+  "packagerPort": null,
+  "packagerPid": null,
+  "expoServerNgrokUrl": null,
+  "packagerNgrokUrl": null,
+  "ngrokPid": null,
+  "webpackServerPort": null
 }
