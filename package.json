@@ -18,7 +18,7 @@
     "react-native-calendars": "^1.263.0",
     "react-navigation": "^3.13.0",
     "rn-pdf-reader-js": "^0.2.1",
-    "set-value": ">=2.0.1",
+    "set-value": ">=4.0.1",
     "uuid": "^3.4.0"
   },
   "devDependencies": {
